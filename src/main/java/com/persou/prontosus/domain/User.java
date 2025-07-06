@@ -8,7 +8,7 @@ import lombok.With;
 @With
 @Builder(toBuilder = true)
 public record User(
-    Long id,
+    String id,
     String username,
     String password,
     String fullName,

@@ -10,7 +10,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-public interface AppointmentJpaRepository extends JpaRepository<AppointmentEntity, Long> {
+public interface AppointmentJpaRepository extends JpaRepository<AppointmentEntity, String> {
     List<AppointmentEntity> findByPatientOrderByScheduledDateTimeDesc(PatientEntity patient);
 
     List<AppointmentEntity> findByHealthcareProfessionalAndScheduledDateTimeBetweenOrderByScheduledDateTime(
@@ -20,10 +20,10 @@ public interface AppointmentJpaRepository extends JpaRepository<AppointmentEntit
         AppointmentStatus status, LocalDateTime start, LocalDateTime end);
 
     @Query("SELECT a FROM AppointmentEntity a WHERE a.patient.id = :patientId AND a.status = :status ORDER BY a.scheduledDateTime DESC")
-    List<AppointmentEntity> findByPatientIdAndStatus(@Param("patientId") Long patientId, @Param("status")
+    List<AppointmentEntity> findByPatientIdAndStatus(@Param("patientId") String patientId, @Param("status")
     AppointmentStatus status);
 
     @Query("SELECT a FROM AppointmentEntity a WHERE a.healthcareProfessional.id = :professionalId AND DATE(a.scheduledDateTime) = DATE(:date) ORDER BY a.scheduledDateTime")
-    List<AppointmentEntity> findByProfessionalAndDate(@Param("professionalId") Long professionalId,
+    List<AppointmentEntity> findByProfessionalAndDate(@Param("professionalId") String professionalId,
                                                       @Param("date") LocalDateTime date);
 }

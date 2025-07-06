@@ -15,7 +15,7 @@ public class FindPatientUseCase {
     private final PatientRepository patientRepository;
     private final PatientMapper patientMapper;
 
-    public Optional<Patient> findById(Long id) {
+    public Optional<Patient> findById(String id) {
         return patientRepository.findById(id);
     }
 

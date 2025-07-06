@@ -1,4 +1,5 @@
 package com.persou.prontosus.config.mapper;
+import com.persou.prontosus.adapters.response.MedicalRecordResponse;
 import com.persou.prontosus.domain.MedicalRecord;
 import com.persou.prontosus.domain.valueobject.VitalSigns;
 import com.persou.prontosus.gateway.database.jpa.MedicalRecordEntity;
@@ -36,6 +37,8 @@ public interface MedicalRecordMapper {
     @Mapping(target = "attachments", ignore = true)
     @Mapping(target = "vitalSigns", source = "vitalSigns")
     MedicalRecordEntity toEntity(MedicalRecord domain);
+
+    MedicalRecordResponse toResponse(MedicalRecord medicalRecord);
 
     @Named("vitalSignsEntityToDomain")
     default VitalSigns vitalSignsEntityToDomain(VitalSignsEntity vitalSignsEntity) {

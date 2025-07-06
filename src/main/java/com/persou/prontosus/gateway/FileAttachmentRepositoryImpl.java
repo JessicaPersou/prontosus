@@ -36,7 +36,7 @@ public class FileAttachmentRepositoryImpl implements FileAttachmentRepository {
     }
 
     @Override
-    public List<FileAttachment> findByPatientId(Long patientId) {
+    public List<FileAttachment> findByPatientId(String patientId) {
         return fileAttachmentJpaRepository.findByPatientId(patientId)
             .stream()
             .map(fileAttachmentMapper::toDomain)
@@ -44,7 +44,7 @@ public class FileAttachmentRepositoryImpl implements FileAttachmentRepository {
     }
 
     @Override
-    public List<FileAttachment> findByPatientIdAndFileType(Long patientId, FileType fileType) {
+    public List<FileAttachment> findByPatientIdAndFileType(String patientId, FileType fileType) {
         return fileAttachmentJpaRepository.findByPatientIdAndFileType(patientId, fileType)
             .stream()
             .map(fileAttachmentMapper::toDomain)

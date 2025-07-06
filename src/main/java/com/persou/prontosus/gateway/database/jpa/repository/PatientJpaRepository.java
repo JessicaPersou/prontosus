@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-public interface PatientJpaRepository extends JpaRepository<PatientEntity, Long> {
+public interface PatientJpaRepository extends JpaRepository<PatientEntity, String> {
     Optional<PatientEntity> findByCpf(String cpf);
 
     @Query("SELECT p FROM PatientEntity p WHERE LOWER(p.fullName) LIKE LOWER(CONCAT('%', :name, '%'))")

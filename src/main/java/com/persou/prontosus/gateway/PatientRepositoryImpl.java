@@ -1,5 +1,7 @@
 package com.persou.prontosus.gateway;
 
+import static com.persou.prontosus.config.MessagesErrorException.ID_CANNOT_BE_NULL_OR_BLANK;
+
 import com.persou.prontosus.config.exceptions.ResourceNotFoundException;
 import com.persou.prontosus.config.mapper.PatientMapper;
 import com.persou.prontosus.domain.Patient;
@@ -14,8 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class PatientRepositoryImpl implements PatientRepository {
 
-    public static final String PATIENT_ID_CANNOT_BE_NULL_OR_BLANK = "Patient ID cannot be null or blank";
-
     private final PatientJpaRepository patientJpaRepository;
     private final PatientMapper patientMapper;
 
@@ -28,9 +28,9 @@ public class PatientRepositoryImpl implements PatientRepository {
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<Patient> findById(Long id) {
+    public Optional<Patient> findById(String id) {
         if (id == null) {
-            throw new ResourceNotFoundException(PATIENT_ID_CANNOT_BE_NULL_OR_BLANK);
+            throw new ResourceNotFoundException(ID_CANNOT_BE_NULL_OR_BLANK);
         }
         var patientEntity = patientJpaRepository.findById(id);
         return patientEntity.map(patientMapper::toDomain);
@@ -73,7 +73,7 @@ public class PatientRepositoryImpl implements PatientRepository {
     @Transactional
     public Patient save(Patient patient) {
         if (patient == null) {
-            throw new IllegalArgumentException("Patient cannot be null");
+            throw new ResourceNotFoundException(ID_CANNOT_BE_NULL_OR_BLANK);
         }
         var patientEntity = patientMapper.toEntity(patient);
         return patientMapper.toDomain(patientJpaRepository.save(patientEntity));

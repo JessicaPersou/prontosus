@@ -7,7 +7,7 @@ import lombok.With;
 @With
 @Builder(toBuilder = true)
 public record UserResponse(
-    Long id,
+    String id,
     String username,
     String fullName,
     String email,

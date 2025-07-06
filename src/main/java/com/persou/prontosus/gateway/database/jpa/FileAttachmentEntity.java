@@ -30,8 +30,8 @@ import lombok.NoArgsConstructor;
 public class FileAttachmentEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private String id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "medical_record_id", nullable = false)

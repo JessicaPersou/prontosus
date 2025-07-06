@@ -1,5 +1,6 @@
 package com.persou.prontosus.config.mapper;
 
+import com.persou.prontosus.adapters.response.FileAttachmentResponse;
 import com.persou.prontosus.domain.FileAttachment;
 import com.persou.prontosus.gateway.database.jpa.FileAttachmentEntity;
 import org.mapstruct.Mapper;
@@ -11,4 +12,6 @@ public interface FileAttachmentMapper {
     FileAttachmentEntity toEntity(FileAttachment fileAttachment);
 
     FileAttachment toDomain(FileAttachmentEntity fileAttachment);
+
+    FileAttachmentResponse toResponse(FileAttachment fileAttachment);
 }

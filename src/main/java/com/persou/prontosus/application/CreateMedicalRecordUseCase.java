@@ -1,5 +1,9 @@
 package com.persou.prontosus.application;
 
+import static com.persou.prontosus.config.MessagesErrorException.HEALTHCARE_PROFESSIONAL_NOT_FOUND;
+import static com.persou.prontosus.config.MessagesErrorException.ENTITY_NOT_FOUND;
+
+import com.persou.prontosus.config.exceptions.ResourceNotFoundException;
 import com.persou.prontosus.domain.MedicalRecord;
 import com.persou.prontosus.domain.Patient;
 import com.persou.prontosus.domain.User;
@@ -20,12 +24,12 @@ public class CreateMedicalRecordUseCase {
     private final PatientRepository patientRepository;
     private final UserRepository userRepository;
 
-    public MedicalRecord execute(Long patientId, Long healthcareProfessionalId, MedicalRecord medicalRecord) {
+    public MedicalRecord execute(String patientId, String healthcareProfessionalId, MedicalRecord medicalRecord) {
         Patient patient = patientRepository.findById(patientId)
-            .orElseThrow(() -> new IllegalArgumentException("Paciente não encontrado"));
+            .orElseThrow(() -> new ResourceNotFoundException(ENTITY_NOT_FOUND));
 
         User healthcareProfessional = userRepository.findById(healthcareProfessionalId)
-            .orElseThrow(() -> new IllegalArgumentException("Profissional de saúde não encontrado"));
+            .orElseThrow(() -> new ResourceNotFoundException(HEALTHCARE_PROFESSIONAL_NOT_FOUND));
 
         MedicalRecord recordToSave = medicalRecord
             .withPatient(patient)

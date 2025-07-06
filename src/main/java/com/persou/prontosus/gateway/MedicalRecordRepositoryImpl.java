@@ -29,7 +29,7 @@ public class MedicalRecordRepositoryImpl implements MedicalRecordRepository {
     }
 
     @Override
-    public List<MedicalRecord> findByPatientIdOrderByConsultationDateDesc(Long patientId) {
+    public List<MedicalRecord> findByPatientIdOrderByConsultationDateDesc(String patientId) {
         return List.of();
     }
 
@@ -39,13 +39,13 @@ public class MedicalRecordRepositoryImpl implements MedicalRecordRepository {
     }
 
     @Override
-    public List<MedicalRecord> findByPatientAndDateRange(Long patientId, LocalDateTime startDate,
+    public List<MedicalRecord> findByPatientAndDateRange(String patientId, LocalDateTime startDate,
                                                          LocalDateTime endDate) {
         return List.of();
     }
 
     @Override
-    public Optional<MedicalRecord> findById(Long id) {
+    public Optional<MedicalRecord> findById(String id) {
         return Optional.empty();
     }
 

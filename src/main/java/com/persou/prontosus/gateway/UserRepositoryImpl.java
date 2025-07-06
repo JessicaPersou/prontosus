@@ -75,18 +75,13 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public User save(User user) {
-        // Converter domínio para entidade JPA
         var entity = userMapper.toEntity(user);
-
-        // Salvar na base de dados
         var savedEntity = userJpaRepository.save(entity);
-
-        // Converter de volta para domínio
         return userMapper.toDomain(savedEntity);
     }
 
     @Override
-    public Optional<User> findById(Long id) {
+    public Optional<User> findById(String id) {
         return userJpaRepository.findById(id)
             .map(userMapper::toDomain);
     }

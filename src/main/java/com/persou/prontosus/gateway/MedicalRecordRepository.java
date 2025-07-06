@@ -12,13 +12,13 @@ public interface MedicalRecordRepository {
 
     List<MedicalRecord> findByHealthcareProfessionalOrderByConsultationDateDesc(User healthcareProfessional);
 
-    List<MedicalRecord> findByPatientIdOrderByConsultationDateDesc(Long patientId);
+    List<MedicalRecord> findByPatientIdOrderByConsultationDateDesc(String patientId);
 
     List<MedicalRecord> findByConsultationDateBetween(LocalDateTime startDate, LocalDateTime endDate);
 
-    List<MedicalRecord> findByPatientAndDateRange(Long patientId, LocalDateTime startDate, LocalDateTime endDate);
+    List<MedicalRecord> findByPatientAndDateRange(String patientId, LocalDateTime startDate, LocalDateTime endDate);
 
-    Optional<MedicalRecord> findById(Long id);
+    Optional<MedicalRecord> findById(String id);
 
     MedicalRecord save(MedicalRecord medicalRecord);
 }

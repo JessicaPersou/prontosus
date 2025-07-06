@@ -9,7 +9,7 @@ import lombok.With;
 @With
 @Builder(toBuilder = true)
 public record MedicalRecord(
-    Long id,
+    String id,
     Patient patient,
     User healthcareProfessional,
     Appointment appointment,

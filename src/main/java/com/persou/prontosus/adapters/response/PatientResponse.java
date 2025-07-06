@@ -9,7 +9,7 @@ import lombok.With;
 @With
 @Builder(toBuilder = true)
 public record PatientResponse(
-    Long id,
+    String id,
     String cpf,
     String fullName,
     LocalDate birthDate,

@@ -14,11 +14,11 @@ public class ViewMedicalHistoryUseCase {
 
     private final MedicalRecordRepository medicalRecordRepository;
 
-    public List<MedicalRecord> getPatientHistory(Long patientId) {
+    public List<MedicalRecord> getPatientHistory(String patientId) {
         return medicalRecordRepository.findByPatientIdOrderByConsultationDateDesc(patientId);
     }
 
-    public List<MedicalRecord> getPatientHistoryByDateRange(Long patientId, LocalDateTime startDate,
+    public List<MedicalRecord> getPatientHistoryByDateRange(String patientId, LocalDateTime startDate,
                                                             LocalDateTime endDate) {
         return medicalRecordRepository.findByPatientAndDateRange(patientId, startDate, endDate);
     }

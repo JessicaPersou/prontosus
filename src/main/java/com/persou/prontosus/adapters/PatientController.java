@@ -11,7 +11,6 @@ import com.persou.prontosus.application.UpdatePatientUseCase;
 import com.persou.prontosus.config.exceptions.ResourceNotFoundException;
 import com.persou.prontosus.config.mapper.PatientMapper;
 import com.persou.prontosus.domain.Patient;
-import com.persou.prontosus.domain.enums.Gender;
 import java.time.LocalDateTime;
 import java.util.List;
 import jakarta.validation.Valid;
@@ -47,7 +46,7 @@ public class PatientController {
 
     @GetMapping("/{id}")
     @ResponseStatus(OK)
-    public PatientResponse findById(@PathVariable Long id) {
+    public PatientResponse findById(@PathVariable String id) {
         var patient = findPatientUseCase.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Paciente não encontrado"));
         return patientMapper.toResponse(patient);
@@ -96,7 +95,7 @@ public class PatientController {
 
     @PutMapping("/{id}")
     @ResponseStatus(OK)
-    public PatientResponse update(@PathVariable Long id, @Valid @RequestBody PatientRequest request) {
+    public PatientResponse update(@PathVariable String id, @Valid @RequestBody PatientRequest request) {
         Patient updatedPatient = Patient.builder()
             .id(id)
             .cpf(request.cpf())

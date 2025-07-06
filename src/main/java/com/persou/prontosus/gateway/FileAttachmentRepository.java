@@ -10,9 +10,9 @@ public interface FileAttachmentRepository {
 
     List<FileAttachment> findByFileType(FileType fileType);
 
-    List<FileAttachment> findByPatientId(Long patientId);
+    List<FileAttachment> findByPatientId(String patientId);
 
-    List<FileAttachment> findByPatientIdAndFileType(Long patientId, FileType fileType);
+    List<FileAttachment> findByPatientIdAndFileType(String patientId, FileType fileType);
 
     FileAttachment save(FileAttachment fileAttachment);
 }

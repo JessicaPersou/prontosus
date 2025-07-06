@@ -10,9 +10,9 @@ import com.persou.prontosus.application.UpdateMedicalRecordUseCase;
 import com.persou.prontosus.application.ViewMedicalHistoryUseCase;
 import com.persou.prontosus.config.mapper.MedicalRecordMapper;
 import com.persou.prontosus.domain.MedicalRecord;
+import jakarta.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.List;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -35,10 +35,10 @@ public class MedicalRecordController {
 
     @GetMapping("/patient/{patientId}")
     @ResponseStatus(OK)
-    public List<MedicalRecordResponse> getPatientHistory(@PathVariable Long patientId) {
+    public List<MedicalRecordResponse> getPatientHistory(@PathVariable String patientId) {
         return viewMedicalHistoryUseCase.getPatientHistory(patientId)
             .stream()
-            .map(this::toResponse)
+            .map(medicalRecordMapper::toResponse)
             .toList();
     }
 
@@ -47,15 +47,15 @@ public class MedicalRecordController {
     public List<MedicalRecordResponse> getProfessionalRecords(@PathVariable Long professionalId) {
         return viewMedicalHistoryUseCase.getProfessionalRecords(professionalId)
             .stream()
-            .map(this::toResponse)
+            .map(medicalRecordMapper::toResponse)
             .toList();
     }
 
     @PostMapping("/patient/{patientId}/professional/{professionalId}")
     @ResponseStatus(CREATED)
     public MedicalRecordResponse create(
-        @PathVariable Long patientId,
-        @PathVariable Long professionalId,
+        @PathVariable String patientId,
+        @PathVariable String professionalId,
         @Valid @RequestBody MedicalRecordRequest request) {
 
         MedicalRecord medicalRecord = MedicalRecord.builder()
@@ -73,12 +73,13 @@ public class MedicalRecordController {
             .build();
 
         MedicalRecord savedRecord = createMedicalRecordUseCase.execute(patientId, professionalId, medicalRecord);
-        return toResponse(savedRecord);
+        return medicalRecordMapper.toResponse(savedRecord);
     }
 
     @PutMapping("/{recordId}")
     @ResponseStatus(OK)
-    public MedicalRecordResponse update(@PathVariable Long recordId, @Valid @RequestBody MedicalRecordRequest request) {
+    public MedicalRecordResponse update(@PathVariable String recordId,
+                                        @Valid @RequestBody MedicalRecordRequest request) {
         MedicalRecord updatedRecord = MedicalRecord.builder()
             .chiefComplaint(request.chiefComplaint())
             .historyOfPresentIllness(request.historyOfPresentIllness())
@@ -91,27 +92,7 @@ public class MedicalRecordController {
             .build();
 
         MedicalRecord savedRecord = updateMedicalRecordUseCase.execute(recordId, updatedRecord);
-        return toResponse(savedRecord);
+        return medicalRecordMapper.toResponse(savedRecord);
     }
 
-    private MedicalRecordResponse toResponse(MedicalRecord medicalRecord) {
-        return MedicalRecordResponse.builder()
-            .id(medicalRecord.id())
-            .patient(medicalRecord.patient())
-            .healthcareProfessional(medicalRecord.healthcareProfessional())
-            .appointment(medicalRecord.appointment())
-            .consultationDate(medicalRecord.consultationDate())
-            .chiefComplaint(medicalRecord.chiefComplaint())
-            .historyOfPresentIllness(medicalRecord.historyOfPresentIllness())
-            .physicalExamination(medicalRecord.physicalExamination())
-            .vitalSigns(medicalRecord.vitalSigns())
-            .diagnosis(medicalRecord.diagnosis())
-            .treatment(medicalRecord.treatment())
-            .prescriptions(medicalRecord.prescriptions())
-            .observations(medicalRecord.observations())
-            .attachments(medicalRecord.attachments())
-            .createdAt(medicalRecord.createdAt())
-            .updatedAt(medicalRecord.updatedAt())
-            .build();
-    }
 }

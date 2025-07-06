@@ -1,5 +1,10 @@
 package com.persou.prontosus.application;
 
+import static com.persou.prontosus.config.MessagesErrorException.DOCUMENT_ALREADY_EXISTS;
+import static com.persou.prontosus.config.MessagesErrorException.EMAIL_ALREADY_EXISTS;
+import static com.persou.prontosus.config.MessagesErrorException.USER_ALREADY_EXISTS;
+
+import com.persou.prontosus.config.exceptions.ResourceAlreadyExistsException;
 import com.persou.prontosus.domain.User;
 import com.persou.prontosus.gateway.UserRepository;
 import java.time.LocalDateTime;
@@ -17,7 +22,6 @@ public class RegisterUserUseCase {
     public User execute(User user) {
         validateUser(user);
 
-        // Criar nova instância com senha criptografada e status ativo
         String encodedPassword = passwordEncoder.encode(user.password());
 
         User userToSave = user
@@ -31,15 +35,15 @@ public class RegisterUserUseCase {
 
     private void validateUser(User user) {
         if (userRepository.existsByUsername(user.username())) {
-            throw new IllegalArgumentException("Nome de usuário já existe");
+            throw new ResourceAlreadyExistsException(USER_ALREADY_EXISTS);
         }
 
         if (userRepository.existsByEmail(user.email())) {
-            throw new IllegalArgumentException("Email já está cadastrado");
+            throw new ResourceAlreadyExistsException(EMAIL_ALREADY_EXISTS);
         }
 
         if (userRepository.existsByProfessionalDocument(user.professionalDocument())) {
-            throw new IllegalArgumentException("Documento profissional já está cadastrado");
+            throw new ResourceAlreadyExistsException(DOCUMENT_ALREADY_EXISTS);
         }
     }
 }

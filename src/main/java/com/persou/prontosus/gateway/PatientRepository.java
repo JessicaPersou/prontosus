@@ -11,7 +11,7 @@ public interface PatientRepository {
     Optional<Patient> findByCpf(String cpf);
 
     @Transactional(readOnly = true)
-    Optional<Patient> findById(Long id);
+    Optional<Patient> findById(String id);
 
     @Transactional(readOnly = true)
     List<Patient> findByFullNameContainingIgnoreCase(String name);

@@ -1,16 +1,22 @@
 package com.persou.prontosus.application;
 
+import static com.persou.prontosus.config.MessagesErrorException.ENTITY_NOT_FOUND;
+import static com.persou.prontosus.config.MessagesErrorException.FILE_LARGER_THAN_10MB;
+import static com.persou.prontosus.config.MessagesErrorException.FILE_NOT_SUPPORTED;
 import static com.persou.prontosus.domain.enums.FileType.EXAM_RESULT;
 import static com.persou.prontosus.domain.enums.FileType.IMAGE;
 import static com.persou.prontosus.domain.enums.FileType.MEDICAL_REPORT;
 import static com.persou.prontosus.domain.enums.FileType.OTHER;
 
+import com.persou.prontosus.config.exceptions.BusinessValidationException;
+import com.persou.prontosus.config.exceptions.ResourceNotFoundException;
 import com.persou.prontosus.domain.FileAttachment;
 import com.persou.prontosus.domain.MedicalRecord;
 import com.persou.prontosus.domain.User;
 import com.persou.prontosus.domain.enums.FileType;
 import com.persou.prontosus.gateway.FileAttachmentRepository;
 import com.persou.prontosus.gateway.MedicalRecordRepository;
+import jakarta.xml.bind.ValidationException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -28,16 +34,18 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class UploadExamFileUseCase {
 
+
+
     private final FileAttachmentRepository fileAttachmentRepository;
     private final MedicalRecordRepository medicalRecordRepository;
 
     @Value("${app.file.upload.dir:uploads}")
     private String uploadDir;
 
-    public FileAttachment execute(Long medicalRecordId, MultipartFile file, String description, User uploadedBy)
+    public FileAttachment execute(String medicalRecordId, MultipartFile file, String description, User uploadedBy)
         throws IOException {
         MedicalRecord medicalRecord = medicalRecordRepository.findById(medicalRecordId)
-            .orElseThrow(() -> new IllegalArgumentException("Registro médico não encontrado"));
+            .orElseThrow(() -> new ResourceNotFoundException(ENTITY_NOT_FOUND));
 
         validateFile(file);
 
@@ -59,22 +67,24 @@ public class UploadExamFileUseCase {
         return fileAttachmentRepository.save(attachment);
     }
 
-    public List<FileAttachment> getPatientFiles(Long patientId) {
+    public List<FileAttachment> getPatientFiles(String patientId) {
         return fileAttachmentRepository.findByPatientId(patientId);
     }
 
     private void validateFile(MultipartFile file) {
         if (file.isEmpty()) {
-            throw new IllegalArgumentException("Arquivo não pode estar vazio");
+            throw new ResourceNotFoundException(ENTITY_NOT_FOUND);
         }
 
         if (file.getSize() > 10 * 1024 * 1024) {
-            throw new IllegalArgumentException("Arquivo não pode ser maior que 10MB");
+            throw new BusinessValidationException(FILE_LARGER_THAN_10MB);
         }
 
         String contentType = file.getContentType();
         if (contentType == null || !isAllowedContentType(contentType)) {
-            throw new IllegalArgumentException("Tipo de arquivo não permitido");
+            throw new BusinessValidationException(FILE_NOT_SUPPORTED);
+
+
         }
     }
 

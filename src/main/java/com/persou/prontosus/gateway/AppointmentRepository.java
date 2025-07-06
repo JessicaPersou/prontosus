@@ -16,7 +16,7 @@ public interface AppointmentRepository {
     List<Appointment> findAppointmentsByStatusAndDateRange(
         AppointmentStatus status, LocalDateTime start, LocalDateTime end);
 
-    List<Appointment> findByPatientIdAndStatus(Long patientId, AppointmentStatus status);
+    List<Appointment> findByPatientIdAndStatus(String patientId, AppointmentStatus status);
 
-    List<Appointment> findByProfessionalAndDate(Long professionalId, LocalDateTime date);
+    List<Appointment> findByProfessionalAndDate(String professionalId, LocalDateTime date);
 }

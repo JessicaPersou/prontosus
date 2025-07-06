@@ -5,6 +5,7 @@ import static org.springframework.http.HttpStatus.OK;
 
 import com.persou.prontosus.adapters.response.FileAttachmentResponse;
 import com.persou.prontosus.application.UploadExamFileUseCase;
+import com.persou.prontosus.config.mapper.FileAttachmentMapper;
 import com.persou.prontosus.domain.FileAttachment;
 import com.persou.prontosus.domain.User;
 import java.io.IOException;
@@ -25,46 +26,30 @@ import org.springframework.web.multipart.MultipartFile;
 public class FileController {
 
     private final UploadExamFileUseCase uploadExamFileUseCase;
+    private final FileAttachmentMapper fileAttachmentMapper;
 
     @PostMapping("/medical-record/{medicalRecordId}")
     @ResponseStatus(CREATED)
     public FileAttachmentResponse uploadFile(
-        @PathVariable Long medicalRecordId,
+        @PathVariable String medicalRecordId,
         @RequestParam("file") MultipartFile file,
         @RequestParam(value = "description", required = false) String description) throws IOException {
-
-        // Para o MVP, criar um usuário mock - em produção viria do contexto de segurança
         User mockUser = User.builder()
-            .id(1L)
+            .id("e7ad215b-d7d2-4df3-873a-b5b292fcdcf3")
             .username("admin")
             .fullName("Administrador")
             .build();
 
         FileAttachment savedFile = uploadExamFileUseCase.execute(medicalRecordId, file, description, mockUser);
-        return toResponse(savedFile);
+        return fileAttachmentMapper.toResponse(savedFile);
     }
 
     @GetMapping("/patient/{patientId}")
     @ResponseStatus(OK)
-    public List<FileAttachmentResponse> getPatientFiles(@PathVariable Long patientId) {
+    public List<FileAttachmentResponse> getPatientFiles(@PathVariable String patientId) {
         return uploadExamFileUseCase.getPatientFiles(patientId)
             .stream()
-            .map(this::toResponse)
+            .map(fileAttachmentMapper::toResponse)
             .toList();
-    }
-
-    private FileAttachmentResponse toResponse(FileAttachment fileAttachment) {
-        return FileAttachmentResponse.builder()
-            .id(fileAttachment.id())
-            .medicalRecord(fileAttachment.medicalRecord())
-            .fileName(fileAttachment.fileName())
-            .filePath(fileAttachment.filePath())
-            .contentType(fileAttachment.contentType())
-            .fileSize(fileAttachment.fileSize())
-            .fileType(fileAttachment.fileType())
-            .description(fileAttachment.description())
-            .uploadedAt(fileAttachment.uploadedAt())
-            .uploadedBy(fileAttachment.uploadedBy())
-            .build();
     }
 }

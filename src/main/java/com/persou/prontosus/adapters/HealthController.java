@@ -16,7 +16,7 @@ public class HealthController {
     public Map<String, Object> health() {
         return Map.of(
             "status", "UP",
-            "application", "ProntuSUS",
+            "application", "ProntoSUS",
             "version", "1.0.0",
             "timestamp", LocalDateTime.now()
         );

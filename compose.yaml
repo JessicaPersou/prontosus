@@ -1,21 +1,19 @@
-# compose.yaml - Configuração corrigida do PostgreSQL
-
 services:
   postgres:
     image: 'postgres:15'
-    container_name: prontosus-postgres
+    container_name: prontosus
     environment:
-      POSTGRES_DB: mydatabase
-      POSTGRES_USER: myuser
-      POSTGRES_PASSWORD: secret
-      POSTGRES_ROOT_PASSWORD: secret
+      POSTGRES_DB: db
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      POSTGRES_ROOT_PASSWORD: root
     ports:
       - '5432:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U myuser -d mydatabase"]
+      test: ["CMD-SHELL", "pg_isready -U root -d db"]
       interval: 30s
       timeout: 10s
       retries: 5

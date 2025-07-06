@@ -9,7 +9,7 @@ import lombok.With;
 @With
 @Builder(toBuilder = true)
 public record FileAttachmentRequest(
-    Long id,
+    String id,
     MedicalRecord medicalRecord,
     String fileName,
     String filePath,

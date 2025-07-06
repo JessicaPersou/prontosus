@@ -10,7 +10,7 @@ import lombok.With;
 @With
 @Builder(toBuilder = true)
 public record AppointmentRequest(
-    Long id,
+    String id,
     Patient patient,
     User healthcareProfessional,
     LocalDateTime scheduledDateTime,

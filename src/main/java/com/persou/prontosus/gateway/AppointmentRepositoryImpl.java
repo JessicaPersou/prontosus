@@ -52,7 +52,7 @@ public class AppointmentRepositoryImpl implements AppointmentRepository {
     }
 
     @Override
-    public List<Appointment> findByPatientIdAndStatus(Long patientId, AppointmentStatus status) {
+    public List<Appointment> findByPatientIdAndStatus(String patientId, AppointmentStatus status) {
         return appointmentJpaRepository.findByPatientIdAndStatus(patientId, status)
             .stream()
             .map(appointmentMapper::toDomain)
@@ -60,7 +60,7 @@ public class AppointmentRepositoryImpl implements AppointmentRepository {
     }
 
     @Override
-    public List<Appointment> findByProfessionalAndDate(Long professionalId, LocalDateTime date) {
+    public List<Appointment> findByProfessionalAndDate(String professionalId, LocalDateTime date) {
         return appointmentJpaRepository.findByProfessionalAndDate(professionalId, date)
             .stream()
             .map(appointmentMapper::toDomain)

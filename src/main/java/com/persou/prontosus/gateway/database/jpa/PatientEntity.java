@@ -39,7 +39,7 @@ public class PatientEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
 
     @Column(unique = true, nullable = false, length = 11)
     @NotBlank(message = "CPF é obrigatório")

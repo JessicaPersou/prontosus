@@ -4,7 +4,6 @@ import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 
 import com.persou.prontosus.config.exceptions.ApiException;
 import com.persou.prontosus.config.exceptions.ErrorType;
-import com.persou.prontosus.config.exceptions.ApiException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;

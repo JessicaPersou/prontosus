@@ -1,9 +1,8 @@
 package com.persou.prontosus.config.mapper;
 
-import com.persou.prontosus.domain.enums.Gender;
-
 import com.persou.prontosus.adapters.response.PatientResponse;
 import com.persou.prontosus.domain.Patient;
+import com.persou.prontosus.domain.enums.Gender;
 import com.persou.prontosus.domain.valueobject.Address;
 import com.persou.prontosus.gateway.database.jpa.AddressEntity;
 import com.persou.prontosus.gateway.database.jpa.PatientEntity;
@@ -75,7 +74,9 @@ public interface PatientMapper {
     }
 
     default Gender mapGender(String gender) {
-        if (gender == null) return null;
+        if (gender == null) {
+            return null;
+        }
         try {
             return Gender.valueOf(gender.toUpperCase());
         } catch (IllegalArgumentException e) {

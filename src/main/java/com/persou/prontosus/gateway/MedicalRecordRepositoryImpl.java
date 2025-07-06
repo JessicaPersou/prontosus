@@ -57,7 +57,8 @@ public class MedicalRecordRepositoryImpl implements MedicalRecordRepository {
     }
 
     @Override
-    public List<MedicalRecord> findByPatientAndDateRange(String patientId, LocalDateTime startDate, LocalDateTime endDate) {
+    public List<MedicalRecord> findByPatientAndDateRange(String patientId, LocalDateTime startDate,
+                                                         LocalDateTime endDate) {
         return medicalRecordJpaRepository.findByPatientAndDateRange(patientId, startDate, endDate)
             .stream()
             .map(medicalRecordMapper::toDomain)

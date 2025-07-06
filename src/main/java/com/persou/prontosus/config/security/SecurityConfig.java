@@ -23,7 +23,8 @@ public class SecurityConfig {
                 .requestMatchers("/patients/**").permitAll() // Para desenvolvimento
                 .anyRequest().authenticated()
             )
-            .httpBasic(httpBasic -> {})
+            .httpBasic(httpBasic -> {
+            })
 //            .headers(headers -> headers.frameOptions().disable()) // Para H2 console
             .build();
     }

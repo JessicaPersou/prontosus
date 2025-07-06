@@ -1,7 +1,7 @@
 package com.persou.prontosus.application;
 
-import static com.persou.prontosus.config.MessagesErrorException.HEALTHCARE_PROFESSIONAL_NOT_FOUND;
 import static com.persou.prontosus.config.MessagesErrorException.ENTITY_NOT_FOUND;
+import static com.persou.prontosus.config.MessagesErrorException.HEALTHCARE_PROFESSIONAL_NOT_FOUND;
 
 import com.persou.prontosus.config.exceptions.ResourceNotFoundException;
 import com.persou.prontosus.domain.MedicalRecord;

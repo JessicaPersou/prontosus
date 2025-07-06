@@ -18,4 +18,5 @@ public record UserRequest(
     LocalDateTime createdAt,
     LocalDateTime updatedAt,
     LocalDateTime lastLoginAt
-) {}
+) {
+}

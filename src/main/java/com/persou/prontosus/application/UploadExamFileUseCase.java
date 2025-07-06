@@ -16,7 +16,6 @@ import com.persou.prontosus.domain.User;
 import com.persou.prontosus.domain.enums.FileType;
 import com.persou.prontosus.gateway.FileAttachmentRepository;
 import com.persou.prontosus.gateway.MedicalRecordRepository;
-import jakarta.xml.bind.ValidationException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -33,7 +32,6 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 @RequiredArgsConstructor
 public class UploadExamFileUseCase {
-
 
 
     private final FileAttachmentRepository fileAttachmentRepository;

@@ -1,4 +1,5 @@
 package com.persou.prontosus.config.mapper;
+
 import com.persou.prontosus.adapters.response.UserResponse;
 import com.persou.prontosus.domain.User;
 import com.persou.prontosus.gateway.database.jpa.UserEntity;

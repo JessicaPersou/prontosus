@@ -1,5 +1,7 @@
 package com.persou.prontosus.adapters;
 
+import static com.persou.prontosus.config.MessagesErrorException.DOCUMENT_NOT_FOUND;
+import static com.persou.prontosus.config.MessagesErrorException.ENTITY_NOT_FOUND;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 
@@ -11,9 +13,9 @@ import com.persou.prontosus.application.UpdatePatientUseCase;
 import com.persou.prontosus.config.exceptions.ResourceNotFoundException;
 import com.persou.prontosus.config.mapper.PatientMapper;
 import com.persou.prontosus.domain.Patient;
+import jakarta.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.List;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -48,7 +50,7 @@ public class PatientController {
     @ResponseStatus(OK)
     public PatientResponse findById(@PathVariable String id) {
         var patient = findPatientUseCase.findById(id)
-            .orElseThrow(() -> new ResourceNotFoundException("Paciente não encontrado"));
+            .orElseThrow(() -> new ResourceNotFoundException(ENTITY_NOT_FOUND));
         return patientMapper.toResponse(patient);
     }
 
@@ -56,7 +58,7 @@ public class PatientController {
     @ResponseStatus(OK)
     public PatientResponse findByCpf(@PathVariable String cpf) {
         var patient = findPatientUseCase.findByCpf(cpf)
-            .orElseThrow(() -> new ResourceNotFoundException("Paciente não encontrado com CPF: " + cpf));
+            .orElseThrow(() -> new ResourceNotFoundException(DOCUMENT_NOT_FOUND + ": " + cpf));
         return patientMapper.toResponse(patient);
     }
 

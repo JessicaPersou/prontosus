@@ -24,5 +24,6 @@ public record PatientResponse(
     String chronicConditions,
     LocalDateTime createdAt,
     LocalDateTime updatedAt
-) {}
+) {
+}
 

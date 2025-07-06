@@ -1,4 +1,5 @@
 package com.persou.prontosus.config.mapper;
+
 import com.persou.prontosus.adapters.response.MedicalRecordResponse;
 import com.persou.prontosus.domain.MedicalRecord;
 import com.persou.prontosus.domain.valueobject.VitalSigns;
@@ -8,7 +9,8 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
 
-@Mapper(componentModel = MappingConstants.ComponentModel.SPRING, uses = {PatientMapper.class, UserMapper.class, AppointmentMapper.class})
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING, uses = {PatientMapper.class, UserMapper.class,
+    AppointmentMapper.class})
 public interface MedicalRecordMapper {
 
     @Mapping(target = "id", source = "existingRecord.id")

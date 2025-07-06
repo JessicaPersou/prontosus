@@ -7,7 +7,6 @@ import com.persou.prontosus.gateway.database.jpa.VitalSignsEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
-import org.mapstruct.Named;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING, uses = {PatientMapper.class, UserMapper.class, AppointmentMapper.class})
 public interface MedicalRecordMapper {
@@ -40,8 +39,7 @@ public interface MedicalRecordMapper {
 
     MedicalRecordResponse toResponse(MedicalRecord medicalRecord);
 
-    @Named("vitalSignsEntityToDomain")
-    default VitalSigns vitalSignsEntityToDomain(VitalSignsEntity vitalSignsEntity) {
+    default VitalSigns map(VitalSignsEntity vitalSignsEntity) {
         if (vitalSignsEntity == null) {
             return null;
         }
@@ -57,8 +55,7 @@ public interface MedicalRecordMapper {
         );
     }
 
-    @Named("vitalSignsDomainToEntity")
-    default VitalSignsEntity vitalSignsDomainToEntity(VitalSigns vitalSigns) {
+    default VitalSignsEntity map(VitalSigns vitalSigns) {
         if (vitalSigns == null) {
             return null;
         }

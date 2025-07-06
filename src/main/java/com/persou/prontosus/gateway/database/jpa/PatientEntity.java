@@ -38,7 +38,7 @@ import lombok.NoArgsConstructor;
 public class PatientEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
     @Column(unique = true, nullable = false, length = 11)

@@ -44,7 +44,7 @@ public class MedicalRecordController {
 
     @GetMapping("/professional/{professionalId}")
     @ResponseStatus(OK)
-    public List<MedicalRecordResponse> getProfessionalRecords(@PathVariable Long professionalId) {
+    public List<MedicalRecordResponse> getProfessionalRecords(@PathVariable String professionalId) {
         return viewMedicalHistoryUseCase.getProfessionalRecords(professionalId)
             .stream()
             .map(medicalRecordMapper::toResponse)

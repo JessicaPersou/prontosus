@@ -23,7 +23,7 @@ public class ViewMedicalHistoryUseCase {
         return medicalRecordRepository.findByPatientAndDateRange(patientId, startDate, endDate);
     }
 
-    public List<MedicalRecord> getProfessionalRecords(Long professionalId) {
+    public List<MedicalRecord> getProfessionalRecords(String professionalId) {
         var professional = User.builder().id(professionalId).build();
         return medicalRecordRepository.findByHealthcareProfessionalOrderByConsultationDateDesc(professional);
     }

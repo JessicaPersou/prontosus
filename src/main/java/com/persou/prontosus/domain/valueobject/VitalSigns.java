@@ -1,22 +1,29 @@
 package com.persou.prontosus.domain.valueobject;
 
-import jakarta.persistence.Embeddable;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Builder;
+import lombok.With;
 
-@Embeddable
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class VitalSigns {
-
-    private Integer systolicPressure;
-    private Integer diastolicPressure;
-    private Integer heartRate;
-    private Double temperature;
-    private Integer respiratoryRate;
-    private Double weight;
-    private Double height;
-    private Double oxygenSaturation;
+@With
+@Builder(toBuilder = true)
+public record VitalSigns(
+    Integer systolicPressure,
+    Integer diastolicPressure,
+    Integer heartRate,
+    Double temperature,
+    Integer respiratoryRate,
+    Double weight,
+    Double height,
+    Double oxygenSaturation
+) {
+    public VitalSigns {
+        if (systolicPressure != null && systolicPressure < 0) {
+            throw new IllegalArgumentException("Pressão sistólica deve ser positiva");
+        }
+        if (diastolicPressure != null && diastolicPressure < 0) {
+            throw new IllegalArgumentException("Pressão diastólica deve ser positiva");
+        }
+        if (heartRate != null && heartRate < 0) {
+            throw new IllegalArgumentException("Frequência cardíaca deve ser positiva");
+        }
+    }
 }

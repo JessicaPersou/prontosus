@@ -16,8 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class CreateMedicalRecordUseCase {
 
-    private final .
-    MedicalRecordRepository medicalRecordRepository;
+    private final MedicalRecordRepository medicalRecordRepository;
     private final PatientRepository patientRepository;
     private final UserRepository userRepository;
 
@@ -28,13 +27,14 @@ public class CreateMedicalRecordUseCase {
         User healthcareProfessional = userRepository.findById(healthcareProfessionalId)
             .orElseThrow(() -> new IllegalArgumentException("Profissional de saúde não encontrado"));
 
-        medicalRecord.patient(patient);
-        medicalRecord.healthcareProfessional(healthcareProfessional);
+        MedicalRecord recordToSave = medicalRecord
+            .withPatient(patient)
+            .withHealthcareProfessional(healthcareProfessional);
 
-        if (medicalRecord.consultationDate() == null) {
-            medicalRecord.consultationDate(LocalDateTime.now());
+        if (recordToSave.consultationDate() == null) {
+            recordToSave = recordToSave.withConsultationDate(LocalDateTime.now());
         }
 
-        return medicalRecordRepository.save(medicalRecord);
+        return medicalRecordRepository.save(recordToSave);
     }
 }

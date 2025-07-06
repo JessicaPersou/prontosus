@@ -5,18 +5,18 @@ import static com.persou.prontosus.domain.enums.FileType.IMAGE;
 import static com.persou.prontosus.domain.enums.FileType.MEDICAL_REPORT;
 import static com.persou.prontosus.domain.enums.FileType.OTHER;
 
-import com.persou.prontosus.config.mapper.FileAttachmentMapper;
-import com.persou.prontosus.config.mapper.MedicalRecordMapper;
 import com.persou.prontosus.domain.FileAttachment;
+import com.persou.prontosus.domain.MedicalRecord;
 import com.persou.prontosus.domain.User;
 import com.persou.prontosus.domain.enums.FileType;
 import com.persou.prontosus.gateway.FileAttachmentRepository;
-import com.persou.prontosus.gateway.database.jpa.repository.MedicalRecordJpaRepository;
+import com.persou.prontosus.gateway.MedicalRecordRepository;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -29,16 +29,14 @@ import org.springframework.web.multipart.MultipartFile;
 public class UploadExamFileUseCase {
 
     private final FileAttachmentRepository fileAttachmentRepository;
-    private final FileAttachmentMapper fileAttachmentMapper;
-    private final MedicalRecordJpaRepository medicalRecordRepository;
-    private final MedicalRecordMapper medicalRecordMapper;
+    private final MedicalRecordRepository medicalRecordRepository;
 
     @Value("${app.file.upload.dir:uploads}")
     private String uploadDir;
 
     public FileAttachment execute(Long medicalRecordId, MultipartFile file, String description, User uploadedBy)
         throws IOException {
-        var medicalRecord = medicalRecordRepository.findById(medicalRecordId)
+        MedicalRecord medicalRecord = medicalRecordRepository.findById(medicalRecordId)
             .orElseThrow(() -> new IllegalArgumentException("Registro médico não encontrado"));
 
         validateFile(file);
@@ -46,8 +44,19 @@ public class UploadExamFileUseCase {
         String fileName = generateUniqueFileName(file.getOriginalFilename());
         String filePath = saveFile(file, fileName);
 
-//        return fileAttachmentRepository.save(attachment);
-        return null;
+        FileAttachment attachment = FileAttachment.builder()
+            .medicalRecord(medicalRecord)
+            .fileName(file.getOriginalFilename())
+            .filePath(filePath)
+            .contentType(file.getContentType())
+            .fileSize(file.getSize())
+            .fileType(determineFileType(file.getContentType()).toString())
+            .description(description)
+            .uploadedAt(LocalDateTime.now())
+            .uploadedBy(uploadedBy)
+            .build();
+
+        return fileAttachmentRepository.save(attachment);
     }
 
     public List<FileAttachment> getPatientFiles(Long patientId) {

@@ -1,9 +1,9 @@
 package com.persou.prontosus.gateway.database.jpa.repository;
 
-import com.persou.prontosus.domain.User;
 import com.persou.prontosus.domain.enums.AppointmentStatus;
 import com.persou.prontosus.gateway.database.jpa.AppointmentEntity;
 import com.persou.prontosus.gateway.database.jpa.PatientEntity;
+import com.persou.prontosus.gateway.database.jpa.UserEntity;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -14,7 +14,7 @@ public interface AppointmentJpaRepository extends JpaRepository<AppointmentEntit
     List<AppointmentEntity> findByPatientOrderByScheduledDateTimeDesc(PatientEntity patient);
 
     List<AppointmentEntity> findByHealthcareProfessionalAndScheduledDateTimeBetweenOrderByScheduledDateTime(
-        User healthcareProfessional, LocalDateTime start, LocalDateTime end);
+        UserEntity healthcareProfessional, LocalDateTime start, LocalDateTime end);
 
     List<AppointmentEntity> findByStatusAndScheduledDateTimeBetween(
         AppointmentStatus status, LocalDateTime start, LocalDateTime end);

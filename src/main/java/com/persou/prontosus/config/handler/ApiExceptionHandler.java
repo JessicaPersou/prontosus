@@ -2,8 +2,9 @@ package com.persou.prontosus.config.handler;
 
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 
-import br.com.jpersou.clinic.shared.exceptions.ApiException;
-import br.com.jpersou.clinic.shared.exceptions.ErrorType;
+import com.persou.prontosus.config.exceptions.ApiException;
+import com.persou.prontosus.config.exceptions.ErrorType;
+import com.persou.prontosus.config.exceptions.ApiException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -13,7 +14,7 @@ public class ApiExceptionHandler {
 
 //    private KoinLogger logger = KoinLogger.getLogger(ApiExceptionHandler.class);
 
-    @ExceptionHandler(ApiException.class)
+    @ExceptionHandler(com.persou.prontosus.config.exceptions.ApiException.class)
     public ResponseEntity<ApiErrorResponse> handleApiException(ApiException ex) {
         ApiErrorResponse response = new ApiErrorResponse(
             ex.getType().getDescription(),

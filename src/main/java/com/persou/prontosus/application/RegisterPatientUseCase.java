@@ -1,32 +1,24 @@
 package com.persou.prontosus.application;
 
-import com.persou.prontosus.domain.User;
-import com.persou.prontosus.gateway.UserRepository;
+import com.persou.prontosus.domain.Patient;
+import com.persou.prontosus.gateway.PatientRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import java.time.LocalDateTime;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class RegisterPatientUseCase {
-    private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
 
-    public Optional<User> execute(String username, String password) {
-        Optional<User> userOpt = userRepository.findByUsername(username);
+    private final PatientRepository patientRepository;
 
-        if (userOpt.isPresent()) {
-            User user = userOpt.get();
-            if (user.active() && passwordEncoder.matches(password, user.password())) {
-                user.lastLoginAt(LocalDateTime.now());
-                userRepository.save(user);
-                return Optional.of(user);
-            }
+    public Patient execute(Patient patient) {
+        validatePatient(patient);
+        return patientRepository.save(patient);
+    }
+
+    private void validatePatient(Patient patient) {
+        if (patientRepository.existsByCpf(patient.cpf())) {
+            throw new IllegalArgumentException("Já existe um paciente cadastrado com este CPF");
         }
-
-        return Optional.empty();
     }
 }

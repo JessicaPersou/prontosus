@@ -1,6 +1,7 @@
 package com.persou.prontosus.gateway;
 
 import com.persou.prontosus.config.mapper.FileAttachmentMapper;
+import com.persou.prontosus.config.mapper.MedicalRecordMapper;
 import com.persou.prontosus.domain.FileAttachment;
 import com.persou.prontosus.domain.MedicalRecord;
 import com.persou.prontosus.domain.enums.FileType;
@@ -15,25 +16,39 @@ public class FileAttachmentRepositoryImpl implements FileAttachmentRepository {
 
     private final FileAttachmentJpaRepository fileAttachmentJpaRepository;
     private final FileAttachmentMapper fileAttachmentMapper;
+    private final MedicalRecordMapper medicalRecordMapper;
 
     @Override
     public List<FileAttachment> findByMedicalRecordOrderByUploadedAtDesc(MedicalRecord medicalRecord) {
-        return List.of();
+        var medicalRecordEntity = medicalRecordMapper.toEntity(medicalRecord);
+        return fileAttachmentJpaRepository.findByMedicalRecordOrderByUploadedAtDesc(medicalRecordEntity)
+            .stream()
+            .map(fileAttachmentMapper::toDomain)
+            .toList();
     }
 
     @Override
     public List<FileAttachment> findByFileType(FileType fileType) {
-        return List.of();
+        return fileAttachmentJpaRepository.findByFileType(fileType)
+            .stream()
+            .map(fileAttachmentMapper::toDomain)
+            .toList();
     }
 
     @Override
     public List<FileAttachment> findByPatientId(Long patientId) {
-        return List.of();
+        return fileAttachmentJpaRepository.findByPatientId(patientId)
+            .stream()
+            .map(fileAttachmentMapper::toDomain)
+            .toList();
     }
 
     @Override
     public List<FileAttachment> findByPatientIdAndFileType(Long patientId, FileType fileType) {
-        return List.of();
+        return fileAttachmentJpaRepository.findByPatientIdAndFileType(patientId, fileType)
+            .stream()
+            .map(fileAttachmentMapper::toDomain)
+            .toList();
     }
 
     @Override

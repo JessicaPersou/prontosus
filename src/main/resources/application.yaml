@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: ProntoSUS
+  config:
+    activate:
+      on-profile: prod
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+  logging:
+    level:
+      com.persou.prontosus: INFO
+      org.springframework.security: WARN
+server:
+  port: 8000

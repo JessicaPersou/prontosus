@@ -1,6 +1,5 @@
 package com.persou.prontosus.gateway;
 
-import com.persou.prontosus.config.exceptions.ResourceNotFoundException;
 import com.persou.prontosus.config.mapper.UserMapper;
 import com.persou.prontosus.domain.User;
 import com.persou.prontosus.domain.enums.ProfessionalRole;
@@ -14,70 +13,81 @@ import org.springframework.stereotype.Repository;
 @RequiredArgsConstructor
 public class UserRepositoryImpl implements UserRepository {
 
-    public static final String USER_NOT_FOUND = "Usuário não existe";
     private final UserJpaRepository userJpaRepository;
     private final UserMapper userMapper;
 
-
     @Override
     public Optional<User> findByUsername(String username) {
-        return Optional.empty();
+        return userJpaRepository.findByUsername(username)
+            .map(userMapper::toDomain);
     }
 
     @Override
     public Optional<User> findByEmail(String email) {
-        return Optional.empty();
+        return userJpaRepository.findByEmail(email)
+            .map(userMapper::toDomain);
     }
 
     @Override
     public Optional<User> findByProfessionalDocument(String professionalDocument) {
-        return Optional.empty();
+        return userJpaRepository.findByProfessionalDocument(professionalDocument)
+            .map(userMapper::toDomain);
     }
 
     @Override
     public List<User> findByRoleAndActiveTrue(ProfessionalRole role) {
-        return List.of();
+        return userJpaRepository.findByRoleAndActiveTrue(role)
+            .stream()
+            .map(userMapper::toDomain)
+            .toList();
     }
 
     @Override
     public List<User> findByActiveTrue() {
-        return List.of();
+        return userJpaRepository.findByActiveTrue()
+            .stream()
+            .map(userMapper::toDomain)
+            .toList();
     }
 
     @Override
     public boolean existsByUsername(String username) {
-        return false;
+        return userJpaRepository.existsByUsername(username);
     }
 
     @Override
     public boolean existsByEmail(String email) {
-        return false;
+        return userJpaRepository.existsByEmail(email);
     }
 
     @Override
     public boolean existsByProfessionalDocument(String professionalDocument) {
-        return false;
+        return userJpaRepository.existsByProfessionalDocument(professionalDocument);
     }
 
     @Override
     public List<User> findByRoleAndNameContaining(ProfessionalRole role, String name) {
-        return List.of();
+        return userJpaRepository.findByRoleAndNameContaining(role, name)
+            .stream()
+            .map(userMapper::toDomain)
+            .toList();
     }
 
     @Override
     public User save(User user) {
-        var existingUser = userJpaRepository.findById(user.id());
-        if (existingUser.isEmpty()) {
-            throw new ResourceNotFoundException(USER_NOT_FOUND);
-        }
-        var toSave = userMapper.toEntity(user);
-        var save = userJpaRepository.save(toSave);
-        return userMapper.toDomain(save);
+        // Converter domínio para entidade JPA
+        var entity = userMapper.toEntity(user);
+
+        // Salvar na base de dados
+        var savedEntity = userJpaRepository.save(entity);
+
+        // Converter de volta para domínio
+        return userMapper.toDomain(savedEntity);
     }
 
     @Override
     public Optional<User> findById(Long id) {
         return userJpaRepository.findById(id)
-                .map(userMapper::toDomain);
+            .map(userMapper::toDomain);
     }
 }

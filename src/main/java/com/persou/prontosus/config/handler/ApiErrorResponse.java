@@ -1,6 +1,6 @@
 package com.persou.prontosus.config.handler;
 
-import br.com.jpersou.clinic.shared.exceptions.ValidationErrorDetail;
+import com.persou.prontosus.config.exceptions.ValidationErrorDetail;
 import java.util.List;
 
 public record ApiErrorResponse(

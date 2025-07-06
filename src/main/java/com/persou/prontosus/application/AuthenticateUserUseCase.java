@@ -22,10 +22,17 @@ public class AuthenticateUserUseCase {
 
         if (userOpt.isPresent()) {
             User user = userOpt.get();
-            if (user.getActive() && passwordEncoder.matches(password, user.getPassword())) {
-                user.setLastLoginAt(LocalDateTime.now());
-                userRepository.save(user);
-                return Optional.of(user);
+
+            // Verificar se o usuário está ativo e a senha confere
+            if (user.active() && passwordEncoder.matches(password, user.password())) {
+
+                // Como User é um record imutável, criar nova instância com lastLoginAt atualizado
+                User updatedUser = user.withLastLoginAt(LocalDateTime.now());
+
+                // Salvar o usuário atualizado
+                User savedUser = userRepository.save(updatedUser);
+
+                return Optional.of(savedUser);
             }
         }
 

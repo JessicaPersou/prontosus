@@ -20,7 +20,7 @@ public class SecurityConfig {
                 .requestMatchers("/actuator/**").permitAll()
                 .requestMatchers("/h2-console/**").permitAll()
                 .requestMatchers("/api/public/**").permitAll()
-                .requestMatchers("/patients/**").permitAll() // Para desenvolvimento
+                .requestMatchers("/patients/**").permitAll()
                 .anyRequest().authenticated()
             )
             .httpBasic(httpBasic -> {

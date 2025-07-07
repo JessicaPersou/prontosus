@@ -8,9 +8,12 @@ import com.persou.prontosus.application.UploadExamFileUseCase;
 import com.persou.prontosus.config.mapper.FileAttachmentMapper;
 import com.persou.prontosus.domain.FileAttachment;
 import com.persou.prontosus.domain.User;
+import com.persou.prontosus.gateway.UserRepository;
 import java.io.IOException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,6 +30,7 @@ public class FileController {
 
     private final UploadExamFileUseCase uploadExamFileUseCase;
     private final FileAttachmentMapper fileAttachmentMapper;
+    private final UserRepository userRepository;
 
     @PostMapping("/medical-record/{medicalRecordId}")
     @ResponseStatus(CREATED)
@@ -34,13 +38,12 @@ public class FileController {
         @PathVariable String medicalRecordId,
         @RequestParam("file") MultipartFile file,
         @RequestParam(value = "description", required = false) String description) throws IOException {
-        User mockUser = User.builder()
-            .id("e7ad215b-d7d2-4df3-873a-b5b292fcdcf3")
-            .username("admin")
-            .fullName("Administrador")
-            .build();
 
-        FileAttachment savedFile = uploadExamFileUseCase.execute(medicalRecordId, file, description, mockUser);
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        User currentUser = userRepository.findByUsername(auth.getName())
+            .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+
+        FileAttachment savedFile = uploadExamFileUseCase.execute(medicalRecordId, file, description, currentUser);
         return fileAttachmentMapper.toResponse(savedFile);
     }
 

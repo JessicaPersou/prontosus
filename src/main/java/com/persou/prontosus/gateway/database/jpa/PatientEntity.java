@@ -1,7 +1,6 @@
 package com.persou.prontosus.gateway.database.jpa;
 
 import com.persou.prontosus.domain.enums.Gender;
-import com.persou.prontosus.domain.valueobject.Address;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
@@ -68,7 +67,7 @@ public class PatientEntity {
     private String email;
 
     @Embedded
-    private Address address;
+    private AddressEntity address;
 
     @Column(length = 200)
     private String emergencyContactName;

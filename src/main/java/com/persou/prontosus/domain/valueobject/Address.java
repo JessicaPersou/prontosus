@@ -15,7 +15,7 @@ public record Address(
     String state
 ) {
     public Address {
-        if (zipCode != null && !zipCode.matches("\\d{8}")) {
+        if (zipCode != null && zipCode.length() > 0 && !zipCode.matches("\\d{8}")) {
             throw new IllegalArgumentException("CEP deve conter 8 dígitos");
         }
     }

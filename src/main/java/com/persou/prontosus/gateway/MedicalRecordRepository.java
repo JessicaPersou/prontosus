@@ -14,6 +14,8 @@ public interface MedicalRecordRepository {
 
     List<MedicalRecord> findByPatientIdOrderByConsultationDateDesc(String patientId);
 
+    List<MedicalRecord> findByHealthcareProfessionalIdOrderByConsultationDateDesc(String professionalId);
+
     List<MedicalRecord> findByConsultationDateBetween(LocalDateTime startDate, LocalDateTime endDate);
 
     List<MedicalRecord> findByPatientAndDateRange(String patientId, LocalDateTime startDate, LocalDateTime endDate);

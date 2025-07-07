@@ -24,3 +24,15 @@ spring:
 
 server:
   port: 8000
+
+app:
+  file:
+    upload:
+      dir: uploads
+
+logging:
+  level:
+    com.persou.prontosus: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    org.springframework.security: INFO

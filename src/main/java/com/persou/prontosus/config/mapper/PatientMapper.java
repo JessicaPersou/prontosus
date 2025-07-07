@@ -42,7 +42,6 @@ public interface PatientMapper {
     @Mapping(target = "updatedAt", expression = "java(java.time.LocalDateTime.now())")
     Patient updateEntityFromDomain(Patient updatedPatient, Patient existingPatient);
 
-    // Mapeamento direto do Address
     default Address map(AddressEntity addressEntity) {
         if (addressEntity == null) {
             return null;

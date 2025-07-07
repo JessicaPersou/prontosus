@@ -11,8 +11,10 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
+@Slf4j
 @Repository
 @RequiredArgsConstructor
 public class MedicalRecordRepositoryImpl implements MedicalRecordRepository {
@@ -27,7 +29,14 @@ public class MedicalRecordRepositoryImpl implements MedicalRecordRepository {
         var patientEntity = patientMapper.toEntity(patient);
         return medicalRecordJpaRepository.findByPatientOrderByConsultationDateDesc(patientEntity)
             .stream()
-            .map(medicalRecordMapper::toDomain)
+            .map(entity -> {
+                try {
+                    return medicalRecordMapper.toDomain(entity);
+                } catch (Exception e) {
+                    log.error("Erro ao mapear MedicalRecordEntity para Domain: {}", e.getMessage(), e);
+                    throw new RuntimeException("Erro no mapeamento do registro médico: " + entity.getId(), e);
+                }
+            })
             .toList();
     }
 
@@ -36,16 +45,63 @@ public class MedicalRecordRepositoryImpl implements MedicalRecordRepository {
         var userEntity = userMapper.toEntity(healthcareProfessional);
         return medicalRecordJpaRepository.findByHealthcareProfessionalOrderByConsultationDateDesc(userEntity)
             .stream()
-            .map(medicalRecordMapper::toDomain)
+            .map(entity -> {
+                try {
+                    return medicalRecordMapper.toDomain(entity);
+                } catch (Exception e) {
+                    log.error("Erro ao mapear MedicalRecordEntity para Domain: {}", e.getMessage(), e);
+                    throw new RuntimeException("Erro no mapeamento do registro médico: " + entity.getId(), e);
+                }
+            })
             .toList();
     }
 
     @Override
     public List<MedicalRecord> findByPatientIdOrderByConsultationDateDesc(String patientId) {
-        return medicalRecordJpaRepository.findByPatientIdOrderByConsultationDateDesc(patientId)
-            .stream()
-            .map(medicalRecordMapper::toDomain)
-            .toList();
+        log.debug("Buscando registros médicos para paciente ID: {}", patientId);
+
+        try {
+            List<MedicalRecord> records =
+                medicalRecordJpaRepository.findByPatientIdOrderByConsultationDateDesc(patientId)
+                    .stream()
+                    .map(entity -> {
+                        log.debug("Mapeando entity com ID: {}", entity.getId());
+                        try {
+                            return medicalRecordMapper.toDomain(entity);
+                        } catch (Exception e) {
+                            log.error("Erro ao mapear MedicalRecordEntity {} para Domain: {}", entity.getId(),
+                                e.getMessage());
+                            log.error("Stack trace completo:", e);
+                            throw new RuntimeException("Erro no mapeamento do registro médico: " + entity.getId(), e);
+                        }
+                    })
+                    .toList();
+
+            log.debug("Encontrados {} registros no repository para paciente {}", records.size(), patientId);
+            return records;
+        } catch (Exception e) {
+            log.error("Erro geral ao buscar registros para paciente {}: {}", patientId, e.getMessage(), e);
+            throw e;
+        }
+    }
+
+    @Override
+    public List<MedicalRecord> findByHealthcareProfessionalIdOrderByConsultationDateDesc(String professionalId) {
+        log.debug("Buscando registros médicos para profissional ID: {}", professionalId);
+        List<MedicalRecord> records =
+            medicalRecordJpaRepository.findByHealthcareProfessionalIdOrderByConsultationDateDesc(professionalId)
+                .stream()
+                .map(entity -> {
+                    try {
+                        return medicalRecordMapper.toDomain(entity);
+                    } catch (Exception e) {
+                        log.error("Erro ao mapear MedicalRecordEntity para Domain: {}", e.getMessage(), e);
+                        throw new RuntimeException("Erro no mapeamento do registro médico: " + entity.getId(), e);
+                    }
+                })
+                .toList();
+        log.debug("Encontrados {} registros no repository para profissional {}", records.size(), professionalId);
+        return records;
     }
 
     @Override

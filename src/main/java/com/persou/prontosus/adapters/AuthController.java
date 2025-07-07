@@ -5,7 +5,6 @@ import static org.springframework.http.HttpStatus.OK;
 
 import com.persou.prontosus.adapters.request.LoginRequest;
 import com.persou.prontosus.adapters.response.LoginResponse;
-import com.persou.prontosus.adapters.response.UserResponse;
 import com.persou.prontosus.application.AuthenticateUserUseCase;
 import com.persou.prontosus.config.exceptions.ResourceNotFoundException;
 import com.persou.prontosus.config.mapper.UserMapper;

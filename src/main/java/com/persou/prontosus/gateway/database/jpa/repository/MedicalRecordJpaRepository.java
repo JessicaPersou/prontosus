@@ -22,6 +22,10 @@ public interface MedicalRecordJpaRepository extends JpaRepository<MedicalRecordE
     List<MedicalRecordEntity> findByConsultationDateBetween(@Param("startDate") LocalDateTime startDate,
                                                             @Param("endDate") LocalDateTime endDate);
 
+    @Query("SELECT mr FROM MedicalRecordEntity mr WHERE mr.healthcareProfessional.id = :professionalId ORDER BY mr.consultationDate DESC")
+    List<MedicalRecordEntity> findByHealthcareProfessionalIdOrderByConsultationDateDesc(
+        @Param("professionalId") String professionalId);
+
     @Query("SELECT mr FROM MedicalRecordEntity mr WHERE mr.patient.id = :patientId AND mr.consultationDate BETWEEN :startDate AND :endDate ORDER BY mr.consultationDate DESC")
     List<MedicalRecordEntity> findByPatientAndDateRange(@Param("patientId") String patientId,
                                                         @Param("startDate") LocalDateTime startDate,

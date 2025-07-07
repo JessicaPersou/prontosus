@@ -1,6 +1,5 @@
 package com.persou.prontosus.gateway.database.jpa;
 
-import com.persou.prontosus.domain.valueobject.VitalSigns;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
@@ -66,7 +65,7 @@ public class MedicalRecordEntity {
     private String physicalExamination;
 
     @Embedded
-    private VitalSigns vitalSigns;
+    private VitalSignsEntity vitalSigns;
 
     @Column(columnDefinition = "TEXT")
     private String diagnosis;

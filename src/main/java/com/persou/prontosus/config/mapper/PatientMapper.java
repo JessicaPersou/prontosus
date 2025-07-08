@@ -23,25 +23,6 @@ public interface PatientMapper {
     @Mapping(target = "appointments", ignore = true)
     PatientEntity toEntity(Patient patient);
 
-    @Mapping(target = "id", source = "updatedPatient.id")
-    @Mapping(target = "cpf", source = "updatedPatient.cpf")
-    @Mapping(target = "fullName", source = "updatedPatient.fullName")
-    @Mapping(target = "birthDate", source = "updatedPatient.birthDate")
-    @Mapping(target = "gender", source = "updatedPatient.gender")
-    @Mapping(target = "phoneNumber", source = "updatedPatient.phoneNumber")
-    @Mapping(target = "email", source = "updatedPatient.email")
-    @Mapping(target = "address", source = "updatedPatient.address")
-    @Mapping(target = "emergencyContactName", source = "updatedPatient.emergencyContactName")
-    @Mapping(target = "emergencyContactPhone", source = "updatedPatient.emergencyContactPhone")
-    @Mapping(target = "knownAllergies", source = "updatedPatient.knownAllergies")
-    @Mapping(target = "currentMedications", source = "updatedPatient.currentMedications")
-    @Mapping(target = "chronicConditions", source = "updatedPatient.chronicConditions")
-    @Mapping(target = "medicalRecords", source = "existingPatient.medicalRecords")
-    @Mapping(target = "appointments", source = "existingPatient.appointments")
-    @Mapping(target = "createdAt", source = "existingPatient.createdAt")
-    @Mapping(target = "updatedAt", expression = "java(java.time.LocalDateTime.now())")
-    Patient updateEntityFromDomain(Patient updatedPatient, Patient existingPatient);
-
     default Address map(AddressEntity addressEntity) {
         if (addressEntity == null) {
             return null;

@@ -3,6 +3,10 @@ package com.persou.prontosus.application;
 import static com.persou.prontosus.config.MessagesErrorException.ENTITY_NOT_FOUND;
 import static com.persou.prontosus.config.MessagesErrorException.FILE_LARGER_THAN_10MB;
 import static com.persou.prontosus.config.MessagesErrorException.FILE_NOT_SUPPORTED;
+import static com.persou.prontosus.domain.enums.FileType.EXAM_RESULT;
+import static com.persou.prontosus.domain.enums.FileType.IMAGE;
+import static com.persou.prontosus.domain.enums.FileType.MEDICAL_REPORT;
+import static com.persou.prontosus.domain.enums.FileType.OTHER;
 
 import com.persou.prontosus.config.exceptions.BusinessValidationException;
 import com.persou.prontosus.config.exceptions.ResourceNotFoundException;
@@ -46,10 +50,9 @@ public class UploadExamFileUseCase {
 
         try {
             log.info("Iniciando upload de arquivo para registro médico: {}", medicalRecordId);
-            log.info("Nome do arquivo: {}, Tamanho: {} bytes", file.getOriginalFilename(), file.getSize());
+            log.info("Arquivo: {}, Tamanho: {} bytes", file.getOriginalFilename(), file.getSize());
             log.info("Usuário que está fazendo upload: {}", uploadedBy.username());
 
-            // Validar se o arquivo não está vazio
             if (file.isEmpty()) {
                 throw new BusinessValidationException("Arquivo não pode estar vazio");
             }
@@ -57,17 +60,15 @@ public class UploadExamFileUseCase {
             var medicalRecordEntity = medicalRecordJpaRepository.findById(medicalRecordId)
                 .orElseThrow(() -> {
                     log.error("Registro médico não encontrado: {}", medicalRecordId);
-                    return new ResourceNotFoundException(ENTITY_NOT_FOUND);
+                    return new ResourceNotFoundException(ENTITY_NOT_FOUND + " - Registro médico: " + medicalRecordId);
                 });
 
             log.info("Registro médico encontrado: {}, Paciente: {}",
                 medicalRecordEntity.getId(),
                 medicalRecordEntity.getPatient().getFullName());
 
-            // Validar arquivo
             validateFile(file);
 
-            // Gerar nome único para o arquivo
             String originalFileName = file.getOriginalFilename();
             if (originalFileName == null || originalFileName.trim().isEmpty()) {
                 originalFileName = "arquivo_sem_nome";
@@ -81,12 +82,11 @@ public class UploadExamFileUseCase {
             var userEntity = userJpaRepository.findByUsername(uploadedBy.username())
                 .orElseThrow(() -> {
                     log.error("Usuário não encontrado: {}", uploadedBy.username());
-                    return new ResourceNotFoundException("Usuário não encontrado");
+                    return new ResourceNotFoundException("Usuário não encontrado: " + uploadedBy.username());
                 });
 
             log.info("Usuário encontrado: {}", userEntity.getFullName());
 
-            // Criar entity do arquivo
             FileAttachmentEntity entity = FileAttachmentEntity.builder()
                 .medicalRecord(medicalRecordEntity)
                 .fileName(originalFileName)
@@ -103,7 +103,6 @@ public class UploadExamFileUseCase {
             FileAttachmentEntity savedEntity = fileAttachmentJpaRepository.save(entity);
             log.info("Arquivo salvo com sucesso: {}", savedEntity.getId());
 
-            // Retornar FileAttachment domain
             return FileAttachment.builder()
                 .id(savedEntity.getId())
                 .fileName(savedEntity.getFileName())
@@ -115,11 +114,14 @@ public class UploadExamFileUseCase {
                 .uploadedAt(savedEntity.getUploadedAt())
                 .build();
 
+        } catch (IOException e) {
+            log.error("Erro de I/O no upload do arquivo: {}", e.getMessage(), e);
+            throw e;
+        } catch (BusinessValidationException | ResourceNotFoundException e) {
+            log.error("Erro de validação no upload: {}", e.getMessage(), e);
+            throw e;
         } catch (Exception e) {
-            log.error("Erro ao fazer upload do arquivo para registro {}: {}", medicalRecordId, e.getMessage(), e);
-            if (e instanceof IOException || e instanceof BusinessValidationException || e instanceof ResourceNotFoundException) {
-                throw e;
-            }
+            log.error("Erro geral no upload do arquivo para registro {}: {}", medicalRecordId, e.getMessage(), e);
             throw new RuntimeException("Erro interno no upload: " + e.getMessage(), e);
         }
     }
@@ -201,16 +203,16 @@ public class UploadExamFileUseCase {
 
     private FileType determineFileType(String contentType) {
         if (contentType == null) {
-            return FileType.OTHER;
+            return OTHER;
         }
 
         if (contentType.startsWith("image/")) {
-            return FileType.IMAGE;
+            return IMAGE;
         } else if (contentType.equals("application/pdf")) {
-            return FileType.EXAM_RESULT;
+            return EXAM_RESULT;
         } else if (contentType.contains("document")) {
-            return FileType.MEDICAL_REPORT;
+            return MEDICAL_REPORT;
         }
-        return FileType.OTHER;
+        return OTHER;
     }
 }

@@ -12,9 +12,11 @@ import com.persou.prontosus.gateway.PatientRepository;
 import com.persou.prontosus.gateway.UserRepository;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -25,20 +27,47 @@ public class CreateMedicalRecordUseCase {
     private final UserRepository userRepository;
 
     public MedicalRecord execute(String patientId, String healthcareProfessionalId, MedicalRecord medicalRecord) {
+        log.info("Criando registro médico para paciente {} e profissional {}", patientId, healthcareProfessionalId);
+
         Patient patient = patientRepository.findById(patientId)
-            .orElseThrow(() -> new ResourceNotFoundException(ENTITY_NOT_FOUND));
+            .orElseThrow(() -> {
+                log.error("Paciente não encontrado: {}", patientId);
+                return new ResourceNotFoundException(ENTITY_NOT_FOUND + " - Paciente: " + patientId);
+            });
 
         User healthcareProfessional = userRepository.findById(healthcareProfessionalId)
-            .orElseThrow(() -> new ResourceNotFoundException(HEALTHCARE_PROFESSIONAL_NOT_FOUND));
+            .orElseThrow(() -> {
+                log.error("Profissional não encontrado: {}", healthcareProfessionalId);
+                return new ResourceNotFoundException(HEALTHCARE_PROFESSIONAL_NOT_FOUND + " - ID: " + healthcareProfessionalId);
+            });
 
-        MedicalRecord recordToSave = medicalRecord
-            .withPatient(patient)
-            .withHealthcareProfessional(healthcareProfessional);
+        log.info("Paciente encontrado: {} - {}", patient.id(), patient.fullName());
+        log.info("Profissional encontrado: {} - {}", healthcareProfessional.id(), healthcareProfessional.fullName());
 
-        if (recordToSave.consultationDate() == null) {
-            recordToSave = recordToSave.withConsultationDate(LocalDateTime.now());
-        }
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime consultationDate = medicalRecord.consultationDate() != null ?
+            medicalRecord.consultationDate() : now;
 
-        return medicalRecordRepository.save(recordToSave);
+        MedicalRecord recordToSave = MedicalRecord.builder()
+            .patient(patient)
+            .healthcareProfessional(healthcareProfessional)
+            .consultationDate(consultationDate)
+            .chiefComplaint(medicalRecord.chiefComplaint())
+            .historyOfPresentIllness(medicalRecord.historyOfPresentIllness())
+            .physicalExamination(medicalRecord.physicalExamination())
+            .vitalSigns(medicalRecord.vitalSigns())
+            .diagnosis(medicalRecord.diagnosis())
+            .treatment(medicalRecord.treatment())
+            .prescriptions(medicalRecord.prescriptions())
+            .observations(medicalRecord.observations())
+            .createdAt(now)
+            .updatedAt(now)
+            .build();
+
+        log.info("Salvando registro médico...");
+        MedicalRecord savedRecord = medicalRecordRepository.save(recordToSave);
+        log.info("Registro médico salvo com sucesso: {}", savedRecord.id());
+
+        return savedRecord;
     }
 }

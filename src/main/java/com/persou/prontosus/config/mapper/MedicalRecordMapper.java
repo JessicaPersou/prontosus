@@ -12,37 +12,20 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
 
-@Mapper(componentModel = MappingConstants.ComponentModel.SPRING, uses = {PatientMapper.class, UserMapper.class,
-    AppointmentMapper.class})
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING, uses = {PatientMapper.class, UserMapper.class})
 public interface MedicalRecordMapper {
 
-    @Mapping(target = "id", source = "existingRecord.id")
-    @Mapping(target = "patient", source = "existingRecord.patient")
-    @Mapping(target = "healthcareProfessional", source = "existingRecord.healthcareProfessional")
-    @Mapping(target = "appointment", source = "existingRecord.appointment")
-    @Mapping(target = "consultationDate", source = "updatedRecord.consultationDate")
-    @Mapping(target = "chiefComplaint", source = "updatedRecord.chiefComplaint")
-    @Mapping(target = "historyOfPresentIllness", source = "updatedRecord.historyOfPresentIllness")
-    @Mapping(target = "physicalExamination", source = "updatedRecord.physicalExamination")
-    @Mapping(target = "vitalSigns", source = "updatedRecord.vitalSigns")
-    @Mapping(target = "diagnosis", source = "updatedRecord.diagnosis")
-    @Mapping(target = "treatment", source = "updatedRecord.treatment")
-    @Mapping(target = "prescriptions", source = "updatedRecord.prescriptions")
-    @Mapping(target = "observations", source = "updatedRecord.observations")
-    @Mapping(target = "attachments", source = "existingRecord.attachments")
-    @Mapping(target = "createdAt", source = "existingRecord.createdAt")
-    @Mapping(target = "updatedAt", expression = "java(java.time.LocalDateTime.now())")
-    MedicalRecord updateRecordFields(MedicalRecord existingRecord, MedicalRecord updatedRecord);
-
-    @Mapping(target = "appointment", ignore = true)
+    @Mapping(target = "appointment", ignore = true) // Ignorar appointment para evitar loops
     @Mapping(target = "vitalSigns", source = "vitalSigns")
     @Mapping(target = "attachments", source = "attachments")
     MedicalRecord toDomain(MedicalRecordEntity entity);
 
+    @Mapping(target = "appointment", ignore = true) // Ignorar appointment para evitar loops
     @Mapping(target = "vitalSigns", source = "vitalSigns")
     @Mapping(target = "attachments", source = "attachments")
     MedicalRecordEntity toEntity(MedicalRecord domain);
 
+    @Mapping(target = "appointment", ignore = true) // Simplificar response
     MedicalRecordResponse toResponse(MedicalRecord medicalRecord);
 
     default VitalSigns mapVitalSigns(VitalSignsEntity vitalSignsEntity) {
@@ -79,7 +62,7 @@ public interface MedicalRecordMapper {
 
     default List<FileAttachment> mapAttachments(List<FileAttachmentEntity> attachmentEntities) {
         if (attachmentEntities == null) {
-            return null;
+            return List.of();
         }
         return attachmentEntities.stream()
             .map(this::mapFileAttachment)
@@ -88,7 +71,7 @@ public interface MedicalRecordMapper {
 
     default List<FileAttachmentEntity> mapAttachmentEntities(List<FileAttachment> attachments) {
         if (attachments == null) {
-            return null;
+            return List.of();
         }
         return attachments.stream()
             .map(this::mapFileAttachmentEntity)

@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,8 +36,7 @@ public class FileController {
     private final UserRepository userRepository;
 
     @PostMapping("/medical-record/{medicalRecordId}")
-    @ResponseStatus(CREATED)
-    public FileAttachmentResponse uploadFile(
+    public ResponseEntity<FileAttachmentResponse> uploadFile(
         @PathVariable String medicalRecordId,
         @RequestParam("file") MultipartFile file,
         @RequestParam(value = "description", required = false) String description) {
@@ -45,30 +45,44 @@ public class FileController {
             log.info("Recebendo upload de arquivo para registro médico: {}", medicalRecordId);
             log.info("Arquivo: {}, Tamanho: {} bytes", file.getOriginalFilename(), file.getSize());
 
+            // Validar autenticação
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             if (auth == null || auth.getName() == null) {
-                throw new RuntimeException("Usuário não autenticado");
+                log.error("Usuário não autenticado");
+                return ResponseEntity.status(401).build();
             }
 
             log.info("Usuário autenticado: {}", auth.getName());
 
+            // Buscar usuário
             User currentUser = userRepository.findByUsername(auth.getName())
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado: " + auth.getName()));
+                .orElseThrow(() -> {
+                    log.error("Usuário não encontrado: {}", auth.getName());
+                    return new RuntimeException("Usuário não encontrado: " + auth.getName());
+                });
 
             log.info("Usuário encontrado: {} - {}", currentUser.username(), currentUser.fullName());
 
+            // Validar arquivo
+            if (file.isEmpty()) {
+                log.error("Arquivo vazio");
+                return ResponseEntity.badRequest().build();
+            }
+
+            // Executar upload
             FileAttachment savedFile = uploadExamFileUseCase.execute(medicalRecordId, file, description, currentUser);
 
             log.info("Upload concluído com sucesso. ID do arquivo: {}", savedFile.id());
 
-            return fileAttachmentMapper.toResponse(savedFile);
+            FileAttachmentResponse response = fileAttachmentMapper.toResponse(savedFile);
+            return ResponseEntity.status(CREATED).body(response);
 
         } catch (IOException e) {
             log.error("Erro de I/O no upload do arquivo: {}", e.getMessage(), e);
-            throw new RuntimeException("Erro ao salvar arquivo: " + e.getMessage(), e);
+            return ResponseEntity.status(500).build();
         } catch (Exception e) {
             log.error("Erro geral no upload do arquivo: {}", e.getMessage(), e);
-            throw new RuntimeException("Erro no upload do arquivo: " + e.getMessage(), e);
+            return ResponseEntity.status(500).build();
         }
     }
 

@@ -17,6 +17,7 @@ import jakarta.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,6 +28,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/patients")
@@ -74,47 +76,65 @@ public class PatientController {
     @PostMapping
     @ResponseStatus(CREATED)
     public PatientResponse create(@Valid @RequestBody PatientRequest request) {
-        Patient patient = Patient.builder()
-            .cpf(request.cpf())
-            .fullName(request.fullName())
-            .birthDate(request.birthDate())
-            .gender(request.gender())
-            .phoneNumber(request.phoneNumber())
-            .email(request.email())
-            .address(request.address())
-            .emergencyContactName(request.emergencyContactName())
-            .emergencyContactPhone(request.emergencyContactPhone())
-            .knownAllergies(request.knownAllergies())
-            .currentMedications(request.currentMedications())
-            .chronicConditions(request.chronicConditions())
-            .createdAt(LocalDateTime.now())
-            .updatedAt(LocalDateTime.now())
-            .build();
+        try {
+            log.info("Criando paciente: {}", request.fullName());
 
-        Patient savedPatient = registerPatientUseCase.execute(patient);
-        return patientMapper.toResponse(savedPatient);
+            Patient patient = Patient.builder()
+                .cpf(request.cpf())
+                .fullName(request.fullName())
+                .birthDate(request.birthDate())
+                .gender(request.gender() != null ? request.gender().toUpperCase() : null)
+                .phoneNumber(request.phoneNumber())
+                .email(request.email())
+                .address(request.address())
+                .emergencyContactName(request.emergencyContactName())
+                .emergencyContactPhone(request.emergencyContactPhone())
+                .knownAllergies(request.knownAllergies())
+                .currentMedications(request.currentMedications())
+                .chronicConditions(request.chronicConditions())
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
+
+            Patient savedPatient = registerPatientUseCase.execute(patient);
+            log.info("Paciente criado com sucesso: {}", savedPatient.id());
+
+            return patientMapper.toResponse(savedPatient);
+        } catch (Exception e) {
+            log.error("Erro ao criar paciente: {}", e.getMessage(), e);
+            throw e;
+        }
     }
 
     @PutMapping("/{id}")
     @ResponseStatus(OK)
     public PatientResponse update(@PathVariable String id, @Valid @RequestBody PatientRequest request) {
-        Patient updatedPatient = Patient.builder()
-            .id(id)
-            .cpf(request.cpf())
-            .fullName(request.fullName())
-            .birthDate(request.birthDate())
-            .gender(request.gender())
-            .phoneNumber(request.phoneNumber())
-            .email(request.email())
-            .address(request.address())
-            .emergencyContactName(request.emergencyContactName())
-            .emergencyContactPhone(request.emergencyContactPhone())
-            .knownAllergies(request.knownAllergies())
-            .currentMedications(request.currentMedications())
-            .chronicConditions(request.chronicConditions())
-            .build();
+        try {
+            log.info("Atualizando paciente: {}", id);
 
-        Patient savedPatient = updatePatientUseCase.execute(id, updatedPatient);
-        return patientMapper.toResponse(savedPatient);
+            Patient updatedPatient = Patient.builder()
+                .id(id)
+                .cpf(request.cpf())
+                .fullName(request.fullName())
+                .birthDate(request.birthDate())
+                .gender(request.gender() != null ? request.gender().toUpperCase() : null)
+                .phoneNumber(request.phoneNumber())
+                .email(request.email())
+                .address(request.address())
+                .emergencyContactName(request.emergencyContactName())
+                .emergencyContactPhone(request.emergencyContactPhone())
+                .knownAllergies(request.knownAllergies())
+                .currentMedications(request.currentMedications())
+                .chronicConditions(request.chronicConditions())
+                .build();
+
+            Patient savedPatient = updatePatientUseCase.execute(id, updatedPatient);
+            log.info("Paciente atualizado com sucesso: {}", savedPatient.id());
+
+            return patientMapper.toResponse(savedPatient);
+        } catch (Exception e) {
+            log.error("Erro ao atualizar paciente {}: {}", id, e.getMessage(), e);
+            throw e;
+        }
     }
 }

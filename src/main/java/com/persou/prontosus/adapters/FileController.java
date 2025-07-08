@@ -12,6 +12,7 @@ import com.persou.prontosus.gateway.UserRepository;
 import java.io.IOException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/files")
@@ -37,22 +39,56 @@ public class FileController {
     public FileAttachmentResponse uploadFile(
         @PathVariable String medicalRecordId,
         @RequestParam("file") MultipartFile file,
-        @RequestParam(value = "description", required = false) String description) throws IOException {
+        @RequestParam(value = "description", required = false) String description) {
 
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        User currentUser = userRepository.findByUsername(auth.getName())
-            .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+        try {
+            log.info("Recebendo upload de arquivo para registro médico: {}", medicalRecordId);
+            log.info("Arquivo: {}, Tamanho: {} bytes", file.getOriginalFilename(), file.getSize());
 
-        FileAttachment savedFile = uploadExamFileUseCase.execute(medicalRecordId, file, description, currentUser);
-        return fileAttachmentMapper.toResponse(savedFile);
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            if (auth == null || auth.getName() == null) {
+                throw new RuntimeException("Usuário não autenticado");
+            }
+
+            log.info("Usuário autenticado: {}", auth.getName());
+
+            User currentUser = userRepository.findByUsername(auth.getName())
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado: " + auth.getName()));
+
+            log.info("Usuário encontrado: {} - {}", currentUser.username(), currentUser.fullName());
+
+            FileAttachment savedFile = uploadExamFileUseCase.execute(medicalRecordId, file, description, currentUser);
+
+            log.info("Upload concluído com sucesso. ID do arquivo: {}", savedFile.id());
+
+            return fileAttachmentMapper.toResponse(savedFile);
+
+        } catch (IOException e) {
+            log.error("Erro de I/O no upload do arquivo: {}", e.getMessage(), e);
+            throw new RuntimeException("Erro ao salvar arquivo: " + e.getMessage(), e);
+        } catch (Exception e) {
+            log.error("Erro geral no upload do arquivo: {}", e.getMessage(), e);
+            throw new RuntimeException("Erro no upload do arquivo: " + e.getMessage(), e);
+        }
     }
 
     @GetMapping("/patient/{patientId}")
     @ResponseStatus(OK)
     public List<FileAttachmentResponse> getPatientFiles(@PathVariable String patientId) {
-        return uploadExamFileUseCase.getPatientFiles(patientId)
-            .stream()
-            .map(fileAttachmentMapper::toResponse)
-            .toList();
+        try {
+            log.info("Buscando arquivos do paciente: {}", patientId);
+
+            List<FileAttachmentResponse> files = uploadExamFileUseCase.getPatientFiles(patientId)
+                .stream()
+                .map(fileAttachmentMapper::toResponse)
+                .toList();
+
+            log.info("Retornando {} arquivos para o paciente {}", files.size(), patientId);
+            return files;
+
+        } catch (Exception e) {
+            log.error("Erro ao buscar arquivos do paciente {}: {}", patientId, e.getMessage(), e);
+            throw new RuntimeException("Erro ao buscar arquivos: " + e.getMessage(), e);
+        }
     }
 }

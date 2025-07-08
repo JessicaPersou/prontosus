@@ -49,6 +49,11 @@ public class UploadExamFileUseCase {
             log.info("Nome do arquivo: {}, Tamanho: {} bytes", file.getOriginalFilename(), file.getSize());
             log.info("Usuário que está fazendo upload: {}", uploadedBy.username());
 
+            // Validar se o arquivo não está vazio
+            if (file.isEmpty()) {
+                throw new BusinessValidationException("Arquivo não pode estar vazio");
+            }
+
             var medicalRecordEntity = medicalRecordJpaRepository.findById(medicalRecordId)
                 .orElseThrow(() -> {
                     log.error("Registro médico não encontrado: {}", medicalRecordId);
@@ -59,9 +64,16 @@ public class UploadExamFileUseCase {
                 medicalRecordEntity.getId(),
                 medicalRecordEntity.getPatient().getFullName());
 
+            // Validar arquivo
             validateFile(file);
 
-            String fileName = generateUniqueFileName(file.getOriginalFilename());
+            // Gerar nome único para o arquivo
+            String originalFileName = file.getOriginalFilename();
+            if (originalFileName == null || originalFileName.trim().isEmpty()) {
+                originalFileName = "arquivo_sem_nome";
+            }
+
+            String fileName = generateUniqueFileName(originalFileName);
             String filePath = saveFile(file, fileName);
 
             log.info("Arquivo salvo em: {}", filePath);
@@ -74,9 +86,10 @@ public class UploadExamFileUseCase {
 
             log.info("Usuário encontrado: {}", userEntity.getFullName());
 
+            // Criar entity do arquivo
             FileAttachmentEntity entity = FileAttachmentEntity.builder()
                 .medicalRecord(medicalRecordEntity)
-                .fileName(file.getOriginalFilename() != null ? file.getOriginalFilename() : "arquivo_sem_nome")
+                .fileName(originalFileName)
                 .filePath(filePath)
                 .contentType(file.getContentType() != null ? file.getContentType() : "application/octet-stream")
                 .fileSize(file.getSize())
@@ -90,7 +103,7 @@ public class UploadExamFileUseCase {
             FileAttachmentEntity savedEntity = fileAttachmentJpaRepository.save(entity);
             log.info("Arquivo salvo com sucesso: {}", savedEntity.getId());
 
-            // Retornar FileAttachment simples
+            // Retornar FileAttachment domain
             return FileAttachment.builder()
                 .id(savedEntity.getId())
                 .fileName(savedEntity.getFileName())
@@ -138,16 +151,12 @@ public class UploadExamFileUseCase {
     private void validateFile(MultipartFile file) {
         log.debug("Validando arquivo...");
 
-        if (file.isEmpty()) {
-            throw new BusinessValidationException("Arquivo não pode estar vazio");
-        }
-
-        if (file.getSize() > 10 * 1024 * 1024) {
+        if (file.getSize() > 10 * 1024 * 1024) { // 10MB
             throw new BusinessValidationException(FILE_LARGER_THAN_10MB);
         }
 
         String contentType = file.getContentType();
-        if (contentType == null || !isAllowedContentType(contentType)) {
+        if (contentType != null && !isAllowedContentType(contentType)) {
             throw new BusinessValidationException(FILE_NOT_SUPPORTED + ": " + contentType);
         }
 
@@ -159,12 +168,13 @@ public class UploadExamFileUseCase {
             contentType.equals("application/pdf") ||
             contentType.startsWith("text/") ||
             contentType.contains("document") ||
-            contentType.contains("spreadsheet");
+            contentType.contains("spreadsheet") ||
+            contentType.equals("application/octet-stream");
     }
 
     private String generateUniqueFileName(String originalFileName) {
         String extension = "";
-        if (originalFileName != null) {
+        if (originalFileName != null && originalFileName.contains(".")) {
             int dotIndex = originalFileName.lastIndexOf('.');
             if (dotIndex > 0 && dotIndex < originalFileName.length() - 1) {
                 extension = originalFileName.substring(dotIndex);

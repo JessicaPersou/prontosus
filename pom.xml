@@ -228,6 +228,12 @@
                         <exclude>com/persou/prontosus/adapters/response/**</exclude>
                         <exclude>com/persou/prontosus/config/**</exclude>
                         <exclude>com/persou/prontosus/domain/**</exclude>
+                        <exclude>com/persou/prontosus/gateway/database/jpa/**</exclude>
+                        <exclude>com/persou/prontosus/gateway/AppointmentRepository.class</exclude>
+                        <exclude>com/persou/prontosus/gateway/FileAttachmentRepository.class</exclude>
+                        <exclude>com/persou/prontosus/gateway/MedicalRecordRepository.class</exclude>
+                        <exclude>com/persou/prontosus/gateway/PatientRepository.class</exclude>
+                        <exclude>com/persou/prontosus/gateway/UserRepository.class</exclude>
                         <exclude>com/persou/prontosus/ClinicApplication.class</exclude>
                     </excludes>
                 </configuration>

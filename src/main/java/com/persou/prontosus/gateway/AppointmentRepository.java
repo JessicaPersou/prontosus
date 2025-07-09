@@ -6,8 +6,13 @@ import com.persou.prontosus.domain.User;
 import com.persou.prontosus.domain.enums.AppointmentStatus;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface AppointmentRepository {
+    Appointment save(Appointment appointment);
+
+    Optional<Appointment> findById(String id);
+
     List<Appointment> findByPatientOrderByScheduledDateTimeDesc(Patient patient);
 
     List<Appointment> findAppointmentsByProfessionalAndDateRange(

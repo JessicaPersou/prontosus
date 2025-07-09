@@ -10,6 +10,7 @@ import com.persou.prontosus.domain.enums.AppointmentStatus;
 import com.persou.prontosus.gateway.database.jpa.repository.AppointmentJpaRepository;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -21,6 +22,19 @@ public class AppointmentRepositoryImpl implements AppointmentRepository {
     private final AppointmentMapper appointmentMapper;
     private final PatientMapper patientMapper;
     private final UserMapper userMapper;
+
+    @Override
+    public Appointment save(Appointment appointment) {
+        var entity = appointmentMapper.toEntity(appointment);
+        var savedEntity = appointmentJpaRepository.save(entity);
+        return appointmentMapper.toDomain(savedEntity);
+    }
+
+    @Override
+    public Optional<Appointment> findById(String id) {
+        return appointmentJpaRepository.findById(id)
+            .map(appointmentMapper::toDomain);
+    }
 
     @Override
     public List<Appointment> findByPatientOrderByScheduledDateTimeDesc(Patient patient) {

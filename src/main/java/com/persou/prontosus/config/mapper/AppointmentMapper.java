@@ -1,5 +1,6 @@
 package com.persou.prontosus.config.mapper;
 
+import com.persou.prontosus.adapters.response.AppointmentResponse;
 import com.persou.prontosus.domain.Appointment;
 import com.persou.prontosus.gateway.database.jpa.AppointmentEntity;
 import org.mapstruct.Mapper;
@@ -14,4 +15,6 @@ public interface AppointmentMapper {
 
     @Mapping(target = "medicalRecord", ignore = true)
     AppointmentEntity toEntity(Appointment domain);
+
+    AppointmentResponse toResponse(Appointment appointment);
 }

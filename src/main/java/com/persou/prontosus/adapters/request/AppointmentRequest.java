@@ -1,8 +1,7 @@
 package com.persou.prontosus.adapters.request;
 
-import com.persou.prontosus.domain.MedicalRecord;
-import com.persou.prontosus.domain.Patient;
-import com.persou.prontosus.domain.User;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.With;
@@ -10,16 +9,22 @@ import lombok.With;
 @With
 @Builder(toBuilder = true)
 public record AppointmentRequest(
-    String id,
-    Patient patient,
-    User healthcareProfessional,
+    @NotBlank(message = "ID do paciente é obrigatório")
+    String patientId,
+
+    @NotBlank(message = "ID do profissional é obrigatório")
+    String healthcareProfessionalId,
+
+    @NotNull(message = "Data e hora do agendamento são obrigatórias")
     LocalDateTime scheduledDateTime,
+
+    @NotBlank(message = "Status é obrigatório")
     String status,
+
+    @NotBlank(message = "Tipo de consulta é obrigatório")
     String type,
+
     String reason,
-    String notes,
-    MedicalRecord medicalRecord,
-    LocalDateTime createdAt,
-    LocalDateTime updatedAt
+    String notes
 ) {
 }

@@ -1,6 +1,5 @@
 package com.persou.prontosus;
 
-import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 
@@ -8,8 +7,5 @@ import org.springframework.context.annotation.Import;
 @SpringBootTest
 class ProntosusApplicationTests {
 
-    @Test
-    void contextLoads() {
-    }
 
 }

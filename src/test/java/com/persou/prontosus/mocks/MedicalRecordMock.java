@@ -103,7 +103,8 @@ public class MedicalRecordMock {
             .healthcareProfessional(UserMock.mockDomain())
             .consultationDate(LocalDateTime.now())
             .chiefComplaint("Dor abdominal intensa")
-            .historyOfPresentIllness("Paciente relata dor abdominal há 2 dias, tipo cólica, localizada em fossa ilíaca direita")
+            .historyOfPresentIllness(
+                "Paciente relata dor abdominal há 2 dias, tipo cólica, localizada em fossa ilíaca direita")
             .physicalExamination("Abdome doloroso à palpação profunda em FID, sinal de Blumberg positivo")
             .vitalSigns(VitalSigns.builder()
                 .systolicPressure(140)

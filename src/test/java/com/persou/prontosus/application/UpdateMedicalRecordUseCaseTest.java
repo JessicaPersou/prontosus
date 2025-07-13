@@ -1,21 +1,25 @@
 package com.persou.prontosus.application;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.argThat;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import com.persou.prontosus.config.exceptions.ResourceNotFoundException;
 import com.persou.prontosus.domain.MedicalRecord;
 import com.persou.prontosus.gateway.database.jpa.MedicalRecordEntity;
 import com.persou.prontosus.gateway.database.jpa.repository.MedicalRecordJpaRepository;
+import java.time.LocalDateTime;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.time.LocalDateTime;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class UpdateMedicalRecordUseCaseTest {
@@ -156,7 +160,8 @@ class UpdateMedicalRecordUseCaseTest {
             .build();
 
         when(medicalRecordJpaRepository.findById(recordId)).thenReturn(Optional.of(existingEntity));
-        when(medicalRecordJpaRepository.save(any(MedicalRecordEntity.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(medicalRecordJpaRepository.save(any(MedicalRecordEntity.class))).thenAnswer(
+            invocation -> invocation.getArgument(0));
 
         updateMedicalRecordUseCase.execute(recordId, updatedRecord);
 
@@ -180,7 +185,8 @@ class UpdateMedicalRecordUseCaseTest {
             .build();
 
         when(medicalRecordJpaRepository.findById(recordId)).thenReturn(Optional.of(existingEntity));
-        when(medicalRecordJpaRepository.save(any(MedicalRecordEntity.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(medicalRecordJpaRepository.save(any(MedicalRecordEntity.class))).thenAnswer(
+            invocation -> invocation.getArgument(0));
 
         updateMedicalRecordUseCase.execute(recordId, updatedRecord);
 
@@ -270,7 +276,8 @@ class UpdateMedicalRecordUseCaseTest {
             .build();
 
         when(medicalRecordJpaRepository.findById(recordId)).thenReturn(Optional.of(existingEntity));
-        when(medicalRecordJpaRepository.save(any(MedicalRecordEntity.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(medicalRecordJpaRepository.save(any(MedicalRecordEntity.class))).thenAnswer(
+            invocation -> invocation.getArgument(0));
 
         updateMedicalRecordUseCase.execute(recordId, updatedRecord);
 

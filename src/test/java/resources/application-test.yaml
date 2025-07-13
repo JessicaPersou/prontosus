@@ -1,0 +1,47 @@
+spring:
+  application:
+    name: ProntoSUS-Test
+
+  datasource:
+    # Será configurado dinamicamente pelo Testcontainers
+    url: jdbc:postgresql://localhost:5432/testdb
+    username: test
+    password: test
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  flyway:
+    enabled: false # Desabilitar Flyway nos testes
+
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+server:
+  port: 0 # Porta aleatória para testes
+
+app:
+  file:
+    upload:
+      dir: test-uploads
+
+jwt:
+  secret: testSecretKey123456789012345678901234567890
+  expiration: 86400000  # 24 horas em milissegundos
+
+logging:
+  level:
+    com.persou.prontosus: INFO
+    org.hibernate.SQL: WARN
+    org.springframework.security: WARN
+    org.testcontainers: WARN

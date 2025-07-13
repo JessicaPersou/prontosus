@@ -1,5 +1,9 @@
 package com.persou.prontosus.integration.config;
 
+import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.anyOf;
+import static org.hamcrest.Matchers.is;
+
 import com.persou.prontosus.integration.config.DatabaseTestConfig.DatabaseHelper;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
@@ -13,10 +17,6 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-
-import static io.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.anyOf;
-import static org.hamcrest.Matchers.is;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Testcontainers
@@ -73,7 +73,8 @@ public abstract class BaseIntegrationTest {
         createUser("nurse", "password", "Nurse Test", "nurse@test.com", "COREN123456", "NURSE");
     }
 
-    private void createUser(String username, String password, String fullName, String email, String document, String role) {
+    private void createUser(String username, String password, String fullName, String email, String document,
+                            String role) {
         try {
             given()
                 .contentType(ContentType.JSON)

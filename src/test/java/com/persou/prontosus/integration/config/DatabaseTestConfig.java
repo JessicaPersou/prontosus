@@ -3,13 +3,12 @@ package com.persou.prontosus.integration.config;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
 
 @Slf4j
 @Component
@@ -87,7 +86,6 @@ public class DatabaseTestConfig {
             try {
                 log.info("Resetando sequências...");
 
-                // Para PostgreSQL, reseta todas as sequências
                 List<String> sequences = jdbcTemplate.queryForList(
                     "SELECT sequence_name FROM information_schema.sequences WHERE sequence_schema = 'public'",
                     String.class
@@ -173,7 +171,6 @@ public class DatabaseTestConfig {
                     log.debug("Usuário admin de teste criado");
                 }
 
-                // Inserir usuário doctor se não existir
                 Long doctorCount = jdbcTemplate.queryForObject(
                     "SELECT COUNT(*) FROM users WHERE username = 'doctor'",
                     Long.class
@@ -188,7 +185,6 @@ public class DatabaseTestConfig {
                     log.debug("Usuário doctor de teste criado");
                 }
 
-                // Inserir usuário nurse se não existir
                 Long nurseCount = jdbcTemplate.queryForObject(
                     "SELECT COUNT(*) FROM users WHERE username = 'nurse'",
                     Long.class

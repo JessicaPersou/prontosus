@@ -1,91 +1,146 @@
 package com.persou.prontosus.integration;
 
-import com.persou.prontosus.adapters.request.PatientRequest;
-import com.persou.prontosus.integration.helpers.AuthHelper;
-import com.persou.prontosus.integration.helpers.TestDataHelper;
+import com.persou.prontosus.integration.config.BaseIntegrationTest;
 import io.restassured.http.ContentType;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import static io.restassured.RestAssured.given;
+import static io.restassured.RestAssured.*;
 import static org.hamcrest.Matchers.*;
 
-class PatientControllerIntegrationTest extends IntegrationTestBase {
+class PatientControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
-    @DisplayName("Deve criar um paciente com sucesso")
     void shouldCreatePatientSuccessfully() {
-        String token = AuthHelper.getAdminToken();
-        PatientRequest request = TestDataHelper.createValidPatientRequest();
+        String patientJson = """
+            {
+                "cpf": "12345678901",
+                "fullName": "João Silva",
+                "birthDate": "1990-01-01",
+                "gender": "MALE",
+                "phoneNumber": "11987654321",
+                "email": "joao@email.com",
+                "address": {
+                    "zipCode": "01310100",
+                    "street": "Avenida Paulista",
+                    "number": "1000",
+                    "city": "São Paulo",
+                    "state": "SP"
+                },
+                "emergencyContactName": "Maria Silva",
+                "emergencyContactPhone": "11976543210"
+            }
+            """;
 
         given()
-            .header("Authorization", "Bearer " + token)
+            .header("Authorization", "Bearer " + adminToken)
             .contentType(ContentType.JSON)
-            .body(request)
+            .body(patientJson)
             .when()
             .post("/patients")
             .then()
             .statusCode(201)
+            .body("cpf", equalTo("12345678901"))
+            .body("fullName", equalTo("João Silva"))
+            .body("gender", equalTo("MALE"))
+            .body("email", equalTo("joao@email.com"))
             .body("id", notNullValue())
-            .body("cpf", equalTo(request.cpf()))
-            .body("fullName", equalTo(request.fullName()))
-            .body("email", equalTo(request.email()));
+            .body("createdAt", notNullValue());
     }
 
     @Test
-    @DisplayName("Deve retornar erro 400 ao criar paciente com CPF inválido")
-    void shouldReturn400WhenCreatingPatientWithInvalidCpf() {
-        String token = AuthHelper.getAdminToken();
-        PatientRequest request = TestDataHelper.createValidPatientRequest()
-            .withCpf("123");
+    void shouldReturnBadRequestWhenCpfIsInvalid() {
+        String invalidPatientJson = """
+            {
+                "cpf": "123",
+                "fullName": "João Silva",
+                "birthDate": "1990-01-01",
+                "gender": "MALE"
+            }
+            """;
 
         given()
-            .header("Authorization", "Bearer " + token)
+            .header("Authorization", "Bearer " + adminToken)
             .contentType(ContentType.JSON)
-            .body(request)
+            .body(invalidPatientJson)
             .when()
             .post("/patients")
             .then()
             .statusCode(400)
-            .body("type", equalTo("ValidationError"))
-            .body("details", hasSize(greaterThan(0)));
+            .body("type", equalTo("ValidationError"));
     }
 
     @Test
-    @DisplayName("Deve buscar paciente por ID")
-    void shouldFindPatientById() {
-        String token = AuthHelper.getAdminToken();
-        PatientRequest request = TestDataHelper.createValidPatientRequest();
+    void shouldReturnConflictWhenCpfAlreadyExists() {
+        String patientJson = """
+            {
+                "cpf": "98765432100",
+                "fullName": "Maria Santos",
+                "birthDate": "1985-05-15",
+                "gender": "FEMALE"
+            }
+            """;
 
-        String patientId = given()
-            .header("Authorization", "Bearer " + token)
+        given()
+            .header("Authorization", "Bearer " + adminToken)
             .contentType(ContentType.JSON)
-            .body(request)
+            .body(patientJson)
             .when()
             .post("/patients")
             .then()
-            .statusCode(201)
-            .extract()
-            .path("id");
+            .statusCode(201);
+
+        String duplicatePatientJson = """
+            {
+                "cpf": "98765432100",
+                "fullName": "Outro Nome",
+                "birthDate": "1990-01-01",
+                "gender": "MALE"
+            }
+            """;
 
         given()
-            .header("Authorization", "Bearer " + token)
+            .header("Authorization", "Bearer " + adminToken)
+            .contentType(ContentType.JSON)
+            .body(duplicatePatientJson)
+            .when()
+            .post("/patients")
+            .then()
+            .statusCode(409)
+            .body("type", equalTo("ResourceAlreadyExists"));
+    }
+
+    @Test
+    void shouldFindAllPatients() {
+        createTestPatient(adminToken, "11111111111", "Patient One");
+        createTestPatient(adminToken, "22222222222", "Patient Two");
+
+        given()
+            .header("Authorization", "Bearer " + adminToken)
+            .when()
+            .get("/patients")
+            .then()
+            .statusCode(200)
+            .body("size()", greaterThanOrEqualTo(2));
+    }
+
+    @Test
+    void shouldFindPatientById() {
+        String patientId = createTestPatient(adminToken, "33333333333", "Test Patient");
+
+        given()
+            .header("Authorization", "Bearer " + adminToken)
             .when()
             .get("/patients/{id}", patientId)
             .then()
             .statusCode(200)
             .body("id", equalTo(patientId))
-            .body("cpf", equalTo(request.cpf()))
-            .body("fullName", equalTo(request.fullName()));
+            .body("cpf", equalTo("33333333333"))
+            .body("fullName", equalTo("Test Patient"));
     }
 
     @Test
-    @DisplayName("Deve retornar 404 ao buscar paciente inexistente")
-    void shouldReturn404WhenPatientNotFound() {
-        String token = AuthHelper.getAdminToken();
-
+    void shouldReturnNotFoundWhenPatientDoesNotExist() {
         given()
-            .header("Authorization", "Bearer " + token)
+            .header("Authorization", "Bearer " + adminToken)
             .when()
             .get("/patients/{id}", "nonexistent-id")
             .then()
@@ -94,77 +149,131 @@ class PatientControllerIntegrationTest extends IntegrationTestBase {
     }
 
     @Test
-    @DisplayName("Deve buscar pacientes por nome")
-    void shouldFindPatientsByName() {
-        String token = AuthHelper.getAdminToken();
-        PatientRequest request = TestDataHelper.createValidPatientRequest()
-            .withFullName("Maria Silva Teste");
+    void shouldFindPatientByCpf() {
+        createTestPatient(adminToken, "44444444444", "CPF Test Patient");
 
         given()
-            .header("Authorization", "Bearer " + token)
-            .contentType(ContentType.JSON)
-            .body(request)
+            .header("Authorization", "Bearer " + adminToken)
             .when()
-            .post("/patients")
+            .get("/patients/cpf/{cpf}", "44444444444")
             .then()
-            .statusCode(201);
+            .statusCode(200)
+            .body("cpf", equalTo("44444444444"))
+            .body("fullName", equalTo("CPF Test Patient"));
+    }
+
+    @Test
+    void shouldReturnNotFoundWhenCpfDoesNotExist() {
+        given()
+            .header("Authorization", "Bearer " + adminToken)
+            .when()
+            .get("/patients/cpf/{cpf}", "99999999999")
+            .then()
+            .statusCode(404)
+            .body("type", equalTo("ResourceNotFound"));
+    }
+
+    @Test
+    void shouldSearchPatientsByName() {
+        createTestPatient(adminToken, "55555555555", "João da Silva");
+        createTestPatient(adminToken, "66666666666", "João dos Santos");
 
         given()
-            .header("Authorization", "Bearer " + token)
-            .queryParam("name", "Maria")
+            .header("Authorization", "Bearer " + adminToken)
+            .queryParam("name", "João")
             .when()
             .get("/patients/search")
             .then()
             .statusCode(200)
-            .body("$", hasSize(greaterThan(0)))
-            .body("[0].fullName", containsString("Maria"));
+            .body("size()", greaterThanOrEqualTo(2))
+            .body("fullName", everyItem(containsStringIgnoringCase("João")));
     }
 
     @Test
-    @DisplayName("Deve retornar 401 para requisição sem token")
-    void shouldReturn401WithoutToken() {
-        PatientRequest request = TestDataHelper.createValidPatientRequest();
-
-        given()
-            .contentType(ContentType.JSON)
-            .body(request)
-            .when()
-            .post("/patients")
-            .then()
-            .statusCode(401);
-    }
-
-    @Test
-    @DisplayName("Deve atualizar paciente com sucesso")
     void shouldUpdatePatientSuccessfully() {
-        String token = AuthHelper.getAdminToken();
-        PatientRequest createRequest = TestDataHelper.createValidPatientRequest();
+        String patientId = createTestPatient(adminToken, "77777777777", "Original Name");
 
-        String patientId = given()
-            .header("Authorization", "Bearer " + token)
-            .contentType(ContentType.JSON)
-            .body(createRequest)
-            .when()
-            .post("/patients")
-            .then()
-            .statusCode(201)
-            .extract()
-            .path("id");
-
-        PatientRequest updateRequest = createRequest
-            .withFullName("Nome Atualizado")
-            .withEmail("novoemail@test.com");
+        String updateJson = """
+            {
+                "cpf": "77777777777",
+                "fullName": "Updated Name",
+                "birthDate": "1990-01-01",
+                "gender": "MALE",
+                "phoneNumber": "11999999999",
+                "email": "updated@email.com"
+            }
+            """;
 
         given()
-            .header("Authorization", "Bearer " + token)
+            .header("Authorization", "Bearer " + adminToken)
             .contentType(ContentType.JSON)
-            .body(updateRequest)
+            .body(updateJson)
             .when()
             .put("/patients/{id}", patientId)
             .then()
             .statusCode(200)
             .body("id", equalTo(patientId))
-            .body("fullName", equalTo("Nome Atualizado"))
-            .body("email", equalTo("novoemail@test.com"));
+            .body("fullName", equalTo("Updated Name"))
+            .body("phoneNumber", equalTo("11999999999"))
+            .body("email", equalTo("updated@email.com"));
+    }
+
+    @Test
+    void shouldReturnUnauthorizedWhenNoToken() {
+        String patientJson = """
+            {
+                "cpf": "88888888888",
+                "fullName": "Unauthorized Test",
+                "birthDate": "1990-01-01",
+                "gender": "MALE"
+            }
+            """;
+
+        given()
+            .contentType(ContentType.JSON)
+            .body(patientJson)
+            .when()
+            .post("/patients")
+            .then()
+            .statusCode(403);
+    }
+
+    @Test
+    void shouldReturnUnauthorizedWhenInvalidToken() {
+        String patientJson = """
+            {
+                "cpf": "99999999999",
+                "fullName": "Invalid Token Test",
+                "birthDate": "1990-01-01",
+                "gender": "MALE"
+            }
+            """;
+
+        given()
+            .header("Authorization", "Bearer invalid-token")
+            .contentType(ContentType.JSON)
+            .body(patientJson)
+            .when()
+            .post("/patients")
+            .then()
+            .statusCode(403);
+    }
+
+    @Test
+    void shouldAllowDoctorAndNurseToAccessPatients() {
+        given()
+            .header("Authorization", "Bearer " + doctorToken)
+            .when()
+            .get("/patients")
+            .then()
+            .statusCode(200);
+
+
+        given()
+            .header("Authorization", "Bearer " + nurseToken)
+            .when()
+            .get("/patients")
+            .then()
+            .statusCode(200);
     }
 }

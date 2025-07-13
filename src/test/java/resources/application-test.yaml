@@ -1,6 +1,9 @@
 spring:
+  application:
+    name: ProntoSUS-Test
+
   datasource:
-    # Será configurado dinamicamente pelo TestContainers
+    # Será configurado dinamicamente pelo Testcontainers
     url: jdbc:postgresql://localhost:5432/testdb
     username: test
     password: test
@@ -16,7 +19,7 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
 
   flyway:
-    enabled: false # Desabilitar Flyway nos testes e usar ddl-auto
+    enabled: false # Desabilitar Flyway nos testes
 
   servlet:
     multipart:
@@ -34,11 +37,11 @@ app:
 
 jwt:
   secret: testSecretKey123456789012345678901234567890
-  expiration: 86400000
+  expiration: 86400000  # 24 horas em milissegundos
 
 logging:
   level:
-    com.persou.prontosus: WARN
+    com.persou.prontosus: INFO
     org.hibernate.SQL: WARN
     org.springframework.security: WARN
     org.testcontainers: WARN

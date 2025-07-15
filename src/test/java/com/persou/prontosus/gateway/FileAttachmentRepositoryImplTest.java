@@ -1,5 +1,14 @@
 package com.persou.prontosus.gateway;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import com.persou.prontosus.config.mapper.FileAttachmentMapper;
 import com.persou.prontosus.config.mapper.MedicalRecordMapper;
 import com.persou.prontosus.domain.FileAttachment;
@@ -8,18 +17,13 @@ import com.persou.prontosus.domain.enums.FileType;
 import com.persou.prontosus.gateway.database.jpa.FileAttachmentEntity;
 import com.persou.prontosus.gateway.database.jpa.MedicalRecordEntity;
 import com.persou.prontosus.gateway.database.jpa.repository.FileAttachmentJpaRepository;
+import java.time.LocalDateTime;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.time.LocalDateTime;
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class FileAttachmentRepositoryImplTest {

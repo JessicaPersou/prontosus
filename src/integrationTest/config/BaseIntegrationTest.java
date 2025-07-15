@@ -25,18 +25,19 @@ public abstract class BaseIntegrationTest {
     @LocalServerPort
     private int port;
 
-//    @ServiceConnection
-//    @Container
-//    private final static PostgresSQL mongoDbContainer = new MongoDBContainer("postgres:15.4");
-//            .withDatabaseName("prontosus")
-//            .withUsername("prontosus")
-//            .withPassword("prontosus");
-//
-//    @DynamicPropertySource
-//    static void setMongoDbProperties(DynamicPropertyRegistry registry) {
-//        registry.add("spring.data.mongodb.uri", mongoDbContainer::getConnectionString);
-//        registry.add("feign.client.starWars.url", MockServerManager::getBaseUrl);
-//    }
+    @ServiceConnection
+    @Container
+    private static final PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>("postgres:15")
+        .withDatabaseName("prontosus")
+        .withUsername("root")
+        .withPassword("root");
+
+    @DynamicPropertySource
+    static void setPostgreSQLProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.datasource.url", postgreSQLContainer::getJdbcUrl);
+        registry.add("spring.datasource.username", postgreSQLContainer::getUsername);
+        registry.add("spring.datasource.password", postgreSQLContainer::getPassword);
+    }
 
     @BeforeAll
     static void tearUp() {

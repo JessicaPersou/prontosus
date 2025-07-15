@@ -20,4 +20,14 @@ public class TestSecurityConfig {
         return http.build();
     }
 
+    @Bean
+    public UserDetailsService testUserDetailsService() {
+        UserDetails admin = User.withDefaultPasswordEncoder()
+            .username("admin")
+            .password("root")
+            .roles("ADMIN")
+            .build();
+        return new InMemoryUserDetailsManager(admin);
+    }
+
 }

@@ -6,6 +6,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.persou.prontosus.config.mapper.PatientMapper;
 import com.persou.prontosus.gateway.PatientRepository;
 import com.persou.prontosus.mocks.PatientMock;
 import java.util.Optional;
@@ -14,14 +15,15 @@ import org.junit.jupiter.api.Test;
 class FindPatientUseCaseTest {
 
     private final PatientRepository patientRepository = mock();
+    private final PatientMapper patientMapper = mock();
+    private final FindPatientUseCase findPatientUseCase = new FindPatientUseCase(patientRepository, patientMapper);
 
     @Test
     void shouldFindPatientById() {
         var patient = PatientMock.mockDomain();
-
         when(patientRepository.findById(patient.id())).thenReturn(Optional.of(patient));
 
-        var result = patientRepository.findById(patient.id());
+        var result = findPatientUseCase.findById(patient.id());
 
         assertThat(result).isPresent().isNotNull();
         assertThat(result.get().id()).isEqualTo(patient.id());
@@ -32,10 +34,9 @@ class FindPatientUseCaseTest {
     @Test
     void shouldFindPatientByCpf() {
         var patient = PatientMock.mockDomain();
-
         when(patientRepository.findByCpf(patient.cpf())).thenReturn(Optional.of(patient));
 
-        var result = patientRepository.findByCpf(patient.cpf());
+        var result = findPatientUseCase.findByCpf(patient.cpf());
 
         assertThat(result).isPresent().isNotNull();
         assertThat(result.get().cpf()).isEqualTo(patient.cpf());

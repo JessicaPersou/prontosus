@@ -59,3 +59,18 @@ Sistema para gestão de prontuários eletrônicos voltado para clínicas e hospi
 
 ## Contato
 Para dúvidas ou sugestões, abra uma issue ou envie e-mail para: `jessica.persou@gmail.com`
+
+## Documentação da API
+A documentação interativa da API está disponível via Swagger após iniciar a aplicação.
+
+- **URL padrão:** [http://localhost:8000/swagger-ui.html](http://localhost:8000/swagger-ui.html)
+- **Requisitos de acesso:**
+  - Caso a autenticação esteja habilitada, é necessário obter um token JWT via endpoint de login e inseri-lo no botão "Authorize" do Swagger.
+- **Funcionalidades disponíveis:**
+  - Cadastro, consulta e atualização de pacientes
+  - Agendamento de consultas
+  - Gerenciamento de usuários
+  - Upload e download de arquivos
+  - Autenticação e autorização
+
+Se o acesso for negado, verifique se a aplicação está rodando e se o usuário possui as permissões necessárias.

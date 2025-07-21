@@ -1,0 +1,296 @@
+openapi: 3.0.3
+info:
+  title: ProntoSUS API
+  description: Gestão de Prontuários Eletrônicos
+  version: 1.0.0
+  contact:
+    name: Jessica Sousa
+    email: jessica.persou@gmail.com
+servers:
+  - url: 'http://localhost:8000'
+    description: Servidor local
+
+paths:
+  /health:
+    get:
+      summary: Verifica o status da aplicação
+      responses:
+        '200':
+          description: Status da aplicação
+  /auth/login:
+    post:
+      summary: Autentica usuário e retorna token JWT
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Token JWT e dados do usuário
+  /users/register:
+    post:
+      summary: Cadastro de novo usuário
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRequest'
+      responses:
+        '201':
+          description: Usuário cadastrado
+  /patients:
+    get:
+      summary: Lista todos os pacientes
+      responses:
+        '200':
+          description: Lista de pacientes
+    post:
+      summary: Cadastra novo paciente
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatientRequest'
+      responses:
+        '201':
+          description: Paciente cadastrado
+  /patients/{id}:
+    get:
+      summary: Consulta paciente por ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Dados do paciente
+    put:
+      summary: Atualiza dados do paciente
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatientRequest'
+      responses:
+        '200':
+          description: Paciente atualizado
+  /appointments:
+    post:
+      summary: Cria novo agendamento
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AppointmentRequest'
+      responses:
+        '201':
+          description: Agendamento criado
+    get:
+      summary: Lista agendamentos
+      responses:
+        '200':
+          description: Lista de agendamentos
+  /appointments/{id}:
+    get:
+      summary: Consulta agendamento por ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Dados do agendamento
+    put:
+      summary: Atualiza agendamento
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AppointmentRequest'
+      responses:
+        '200':
+          description: Agendamento atualizado
+  /medical-records/patient/{patientId}:
+    get:
+      summary: Lista histórico médico do paciente
+      parameters:
+        - name: patientId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Histórico médico
+  /medical-records:
+    post:
+      summary: Cria novo registro médico
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MedicalRecordRequest'
+      responses:
+        '201':
+          description: Registro médico criado
+  /medical-records/{id}:
+    put:
+      summary: Atualiza registro médico
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MedicalRecordRequest'
+      responses:
+        '200':
+          description: Registro médico atualizado
+  /files/medical-record/{medicalRecordId}:
+    post:
+      summary: Faz upload de arquivo para registro médico
+      parameters:
+        - name: medicalRecordId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                description:
+                  type: string
+      responses:
+        '201':
+          description: Arquivo enviado
+components:
+  schemas:
+    LoginRequest:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+      required:
+        - username
+        - password
+    UserRequest:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+        fullName:
+          type: string
+        email:
+          type: string
+        professionalDocument:
+          type: string
+        role:
+          type: string
+        specialty:
+          type: string
+      required:
+        - username
+        - password
+        - fullName
+        - email
+        - professionalDocument
+        - role
+    PatientRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        birthDate:
+          type: string
+          format: date
+        document:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        address:
+          type: string
+      required:
+        - name
+        - birthDate
+        - document
+    AppointmentRequest:
+      type: object
+      properties:
+        patientId:
+          type: string
+        healthcareProfessionalId:
+          type: string
+        scheduledDateTime:
+          type: string
+          format: date-time
+        status:
+          type: string
+        type:
+          type: string
+      required:
+        - patientId
+        - healthcareProfessionalId
+        - scheduledDateTime
+        - status
+        - type
+    MedicalRecordRequest:
+      type: object
+      properties:
+        patientId:
+          type: string
+        appointmentId:
+          type: string
+        description:
+          type: string
+        diagnosis:
+          type: string
+        prescription:
+          type: string
+      required:
+        - patientId
+        - appointmentId
+        - description
+        - diagnosis
+        - prescription

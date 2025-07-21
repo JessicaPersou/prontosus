@@ -32,6 +32,7 @@ public class SecurityConfig {
                 .requestMatchers("/actuator/**").permitAll()
                 .requestMatchers("/users/register").permitAll()
                 .requestMatchers("/auth/login").permitAll()
+                .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**", "/api-docs/**").permitAll()
                 .requestMatchers("/users/**").hasRole("ADMIN")
                 .requestMatchers("/patients/**").hasAnyRole("DOCTOR", "NURSE", "ADMIN")
                 .requestMatchers("/medical-records/**").hasAnyRole("DOCTOR", "ADMIN")

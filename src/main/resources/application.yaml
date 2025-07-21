@@ -40,9 +40,12 @@ jwt:
   secret: mySecretKey123456789012345678901234567890
   expiration: 86400000  # 24 horas em milissegundos
 
-logging:
-  level:
-    com.persou.prontosus: DEBUG
-    org.hibernate.SQL: DEBUG
-    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
-    org.springframework.security: INFO
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    operationsSorter: alpha
+    enabled: true
+  api-docs:
+    path: /api-docs
+    enabled: true
+  packagesToScan: com.persou.prontosus.adapters

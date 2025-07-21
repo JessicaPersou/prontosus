@@ -58,4 +58,4 @@ Sistema para gestão de prontuários eletrônicos voltado para clínicas e hospi
 - Consulte o arquivo `HELP.md` para dúvidas comuns
 
 ## Contato
-Para dúvidas ou sugestões, abra uma issue ou envie e-mail para o mantenedor do projeto.
+Para dúvidas ou sugestões, abra uma issue ou envie e-mail para: `jessica.persou@gmail.com`

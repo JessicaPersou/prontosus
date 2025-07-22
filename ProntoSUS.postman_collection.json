@@ -1,0 +1,784 @@
+{
+	"info": {
+		"_postman_id": "3d9e7a31-5267-4f46-b392-f550af45c3a0",
+		"name": "ProntoSUS",
+		"description": "API para Sistema de Prontuários Médicos",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "19199790"
+	},
+	"item": [
+		{
+			"name": "Health Check",
+			"item": [
+				{
+					"name": "Health Check",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:8000/actuator/health",
+						"description": "Verificar status da aplicação"
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints para verificação de saúde da aplicação"
+		},
+		{
+			"name": "Autenticação",
+			"item": [
+				{
+					"name": "Registrar Novo Usuário",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"usuario_teste\",\n  \"password\": \"senha123\",\n  \"fullName\": \"Usuario Teste\",\n  \"email\": \"usuario_teste@prontosus.com\",\n  \"professionalDocument\": \"CRM1111\",\n  \"role\": \"ADMIN\",\n  \"specialty\": null\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8000/users/register",
+						"description": "Registrar um novo usuário no sistema"
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Login successful\", function() {",
+									"    const responseJson = pm.response.json();",
+									"    const token = responseJson.token;",
+									"    pm.environment.set(\"Token\", token);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"usuario_teste\",\n  \"password\": \"senha123\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8000/auth/login",
+						"description": "Fazer login e obter token JWT"
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints para autenticação e registro de usuários"
+		},
+		{
+			"name": "Pacientes",
+			"item": [
+				{
+					"name": "Listar Pacientes",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{Token}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:8000/patients",
+						"description": "Listar todos os pacientes"
+					},
+					"response": []
+				},
+				{
+					"name": "Buscar Paciente por CPF",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{Token}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:8000/patients/cpf/12345678901",
+						"description": "Buscar paciente pelo CPF"
+					},
+					"response": []
+				},
+				{
+					"name": "Buscar Paciente por Nome",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{Token}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/patients/search?name=Ana",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"patients",
+								"search"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "Ana"
+								}
+							]
+						},
+						"description": "Buscar paciente pelo nome"
+					},
+					"response": []
+				},
+				{
+					"name": "Buscar Paciente por ID",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{Token}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:8000/patients/p1a2b3c4-d5e6-7f8g-9h0i-j1k2l3m4n5o6",
+						"description": "Buscar paciente específico pelo ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Criar Paciente",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"ID new user\", function() {\r",
+									"    const responseJson = pm.response.json();\r",
+									"    const id = responseJson.id;\r",
+									"    pm.environment.set(\"IdPatient\", id);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{Token}}"
+							}
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"cpf\": \"11122233344\",\n  \"fullName\": \"João da Silva\",\n  \"birthDate\": \"1990-05-15\",\n  \"gender\": \"MALE\",\n  \"phoneNumber\": \"11999887766\",\n  \"email\": \"joao.silva@email.com\",\n  \"address\": {\n    \"zipCode\": \"01234567\",\n    \"street\": \"Rua das Flores\",\n    \"number\": \"123\",\n    \"complement\": \"Apto 45\",\n    \"neighborhood\": \"Centro\",\n    \"city\": \"São Paulo\",\n    \"state\": \"SP\"\n  },\n  \"emergencyContactName\": \"Maria da Silva\",\n  \"emergencyContactPhone\": \"11988776655\",\n  \"knownAllergies\": \"Dipirona\",\n  \"currentMedications\": \"Paracetamol 500mg\",\n  \"chronicConditions\": \"Hipertensão\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8000/patients",
+						"description": "Criar novo paciente"
+					},
+					"response": []
+				},
+				{
+					"name": "Atualizar Paciente",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{Token}}"
+							}
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"cpf\": \"11122233344\",\n    \"fullName\": \"João da Silva\",\n    \"birthDate\": \"1990-05-15\",\n    \"gender\": \"MALE\",\n    \"phoneNumber\": \"11999887766\",\n    \"email\": \"joao.silva@email.com\",\n    \"address\": {\n      \"zipCode\": \"01234567\",\n      \"street\": \"Rua das Flores\",\n      \"number\": \"123\",\n      \"complement\": \"Apto 45\",\n      \"neighborhood\": \"Centro\",\n      \"city\": \"São Paulo\",\n      \"state\": \"SP\"\n    },\n    \"emergencyContactName\": \"Maria da Silva\",\n    \"emergencyContactPhone\": \"11988776655\",\n    \"knownAllergies\": \"Dipirona\",\n    \"currentMedications\": \"Paracetamol 500mg\",\n    \"chronicConditions\": \"Hipertensão\"\n  }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8000/patients/{{IdPatient}}",
+						"description": "Atualizar dados do paciente"
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints para gerenciamento de pacientes"
+		},
+		{
+			"name": "Prontuários Médicos",
+			"item": [
+				{
+					"name": "Histórico Médico do Paciente",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{Token}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:8000/medical-records/patient/p3c4d5e6-f7g8-9h0i-1j2k-l3m4n5o6p7q8",
+						"description": "Obter histórico médico completo do paciente"
+					},
+					"response": []
+				},
+				{
+					"name": "Prontuários do Profissional",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{Token}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:8000/medical-records/professional/f8bd326c-e8e3-5ef4-974b-c6c393ged4f4",
+						"description": "Obter todos os prontuários criados pelo profissional"
+					},
+					"response": []
+				},
+				{
+					"name": "Criar Prontuário",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{Token}}"
+							}
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"symptoms\": \"Dor de cabeça intensa, náuseas\",\n  \"diagnosis\": \"Enxaqueca\",\n  \"treatment\": \"Repouso, medicação analgésica\",\n  \"prescription\": \"Dipirona 500mg - 1 comprimido a cada 6h\",\n  \"observations\": \"Paciente relata histórico familiar de enxaqueca\",\n  \"visitDate\": \"2025-07-07T14:30:00Z\",\n  \"chiefComplaint\": \"Dor de cabeça intensa\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8000/medical-records/patient/p1a2b3c4-d5e6-7f8g-9h0i-j1k2l3m4n5o6/professional/f8bd326c-e8e3-5ef4-974b-c6c393ged4f4",
+						"description": "Criar novo prontuário médico"
+					},
+					"response": []
+				},
+				{
+					"name": "Atualizar Prontuário",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{Token}}"
+							}
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"symptoms\": \"Dor de cabeça intensa, náuseas, sensibilidade à luz\",\n  \"diagnosis\": \"Enxaqueca com aura\",\n  \"treatment\": \"Repouso em ambiente escuro, medicação analgésica\",\n  \"prescription\": \"Dipirona 500mg - 1 comprimido a cada 6h por 3 dias\",\n  \"observations\": \"Paciente apresentou melhora após 2 horas de tratamento\",\n  \"visitDate\": \"2025-07-07T14:30:00Z\",\n  \"chiefComplaint\": \"Dor de cabeça intensa\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8000/medical-records/mr1a2b3c-4d5e-6f7g-8h9i-0j1k2l3m4n5o",
+						"description": "Atualizar prontuário médico existente"
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints para gerenciamento de prontuários médicos"
+		},
+		{
+			"name": "Arquivos",
+			"item": [
+				{
+					"name": "Upload de Arquivo",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{Token}}"
+							}
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "/C:/Users/Jessi/OneDrive/Documentos/exame.docx"
+								},
+								{
+									"key": "description",
+									"value": "Exame de sangue",
+									"type": "text"
+								}
+							]
+						},
+						"url": "http://localhost:8000/files/medical-record/mr1a2b3c-4d5e-6f7g-8h9i-0j1k2l3m4n5o",
+						"description": "Fazer upload de arquivo para prontuário médico"
+					},
+					"response": []
+				},
+				{
+					"name": "Arquivos do Paciente",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{Token}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:8000/files/patient/p1a2b3c4-d5e6-7f8g-9h0i-j1k2l3m4n5o6",
+						"description": "Listar todos os arquivos de um paciente"
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints para gerenciamento de arquivos"
+		},
+		{
+			"name": "Consultas",
+			"item": [
+				{
+					"name": "Agendamento de Emergência",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{Token}}"
+							}
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer SEU_TOKEN_JWT"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"patientId\": \"p2b3c4d5-e6f7-8g9h-0i1j-k2l3m4n5o6p7\",\n    \"healthcareProfessionalId\": \"f8bd326c-e8e3-5ef4-974b-c6c393ged4f4\",\n    \"scheduledDateTime\": \"2025-07-10T09:00:00\",\n    \"status\": \"SCHEDULED\",\n    \"type\": \"EMERGENCY\",\n    \"reason\": \"Dor no peito\",\n    \"notes\": \"Paciente com dor torácica aguda\"\n  }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8000/appointments"
+					},
+					"response": []
+				},
+				{
+					"name": "Novo Agendamento",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{Token}}"
+							}
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer SEU_TOKEN_JWT"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"patientId\": \"p1a2b3c4-d5e6-7f8g-9h0i-j1k2l3m4n5o6\",\n    \"healthcareProfessionalId\": \"f8bd326c-e8e3-5ef4-974b-c6c393ged4f4\",\n    \"scheduledDateTime\": \"2025-07-15T14:30:00\",\n    \"status\": \"SCHEDULED\",\n    \"type\": \"CONSULTATION\",\n    \"reason\": \"Consulta de rotina\",\n    \"notes\": \"Paciente relata dor de cabeça recorrente\"\n  }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8000/appointments"
+					},
+					"response": []
+				},
+				{
+					"name": "Agendamento de Retorno",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{Token}}"
+							}
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer SEU_TOKEN_JWT"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"patientId\": \"p3c4d5e6-f7g8-9h0i-1j2k-l3m4n5o6p7q8\",\n    \"healthcareProfessionalId\": \"f8bd326c-e8e3-5ef4-974b-c6c393ged4f4\",\n    \"scheduledDateTime\": \"2025-07-20T16:00:00\",\n    \"status\": \"SCHEDULED\",\n    \"type\": \"FOLLOW_UP\",\n    \"reason\": \"Retorno diabetes\",\n    \"notes\": \"Acompanhamento glicemia e medicação\"\n  }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8000/appointments"
+					},
+					"response": []
+				},
+				{
+					"name": "Atualizar Status de Um Agendamento",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{Token}}"
+							}
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer SEU_TOKEN_JWT"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"patientId\": \"p1a2b3c4-d5e6-7f8g-9h0i-j1k2l3m4n5o6\",\n    \"healthcareProfessionalId\": \"f8bd326c-e8e3-5ef4-974b-c6c393ged4f4\",\n    \"scheduledDateTime\": \"2025-07-15T15:00:00\",\n    \"status\": \"IN_PROGRESS\",\n    \"type\": \"CONSULTATION\",\n    \"reason\": \"Consulta de rotina\",\n    \"notes\": \"Paciente chegou pontualmente. Iniciando atendimento.\"\n  }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8000/appointments/5215ca4e-bb16-46c7-a938-2524dba25d85"
+					},
+					"response": []
+				},
+				{
+					"name": "Agendamento como Concluído",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{Token}}"
+							}
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer SEU_TOKEN_JWT"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"patientId\": \"p1a2b3c4-d5e6-7f8g-9h0i-j1k2l3m4n5o6\",\n    \"healthcareProfessionalId\": \"f8bd326c-e8e3-5ef4-974b-c6c393ged4f4\",\n    \"scheduledDateTime\": \"2025-07-15T15:00:00\",\n    \"status\": \"COMPLETED\",\n    \"type\": \"CONSULTATION\",\n    \"reason\": \"Consulta de rotina\",\n    \"notes\": \"Consulta realizada com sucesso. Paciente orientado.\"\n  }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8000/appointments/5215ca4e-bb16-46c7-a938-2524dba25d85"
+					},
+					"response": []
+				},
+				{
+					"name": "Cancelar Agendamento",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{Token}}"
+							}
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer SEU_TOKEN_JWT"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"patientId\": \"p1a2b3c4-d5e6-7f8g-9h0i-j1k2l3m4n5o6\",\n    \"healthcareProfessionalId\": \"f8bd326c-e8e3-5ef4-974b-c6c393ged4f4\",\n    \"scheduledDateTime\": \"2025-07-15T15:00:00\",\n    \"status\": \"CANCELLED\",\n    \"type\": \"CONSULTATION\",\n    \"reason\": \"Consulta de rotina\",\n    \"notes\": \"Cancelado a pedido do paciente\"\n  }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8000/appointments/5215ca4e-bb16-46c7-a938-2524dba25d85"
+					},
+					"response": []
+				},
+				{
+					"name": "Agendamento por status",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{Token}}"
+							}
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer SEU_TOKEN_JWT"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8000/appointments/status/SCHEDULED?start=2025-07-01T00:00:00&end=2025-07-31T23:59:59",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"appointments",
+								"status",
+								"SCHEDULED"
+							],
+							"query": [
+								{
+									"key": "start",
+									"value": "2025-07-01T00:00:00"
+								},
+								{
+									"key": "end",
+									"value": "2025-07-31T23:59:59"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Buscar agendamentos de um paciente por status",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{Token}}"
+							}
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer SEU_TOKEN_JWT"
+							}
+						],
+						"url": "http://localhost:8000/appointments/patient/p1a2b3c4-d5e6-7f8g-9h0i-j1k2l3m4n5o6/status/SCHEDULED"
+					},
+					"response": []
+				},
+				{
+					"name": "Buscar agendamentos de um profissional em data específica",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{Token}}"
+							}
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer SEU_TOKEN_JWT"
+							}
+						],
+						"url": "http://localhost:8000/appointments/professional/f8bd326c-e8e3-5ef4-974b-c6c393ged4f4/date/2025-07-15T00:00:00"
+					},
+					"response": []
+				},
+				{
+					"name": "Buscar agendamentos de um profissional com período específico",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{Token}}"
+							}
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer SEU_TOKEN_JWT"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8000/appointments/professional/f8bd326c-e8e3-5ef4-974b-c6c393ged4f4?start=2025-07-01T00:00:00&end=2025-07-31T23:59:59",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"appointments",
+								"professional",
+								"f8bd326c-e8e3-5ef4-974b-c6c393ged4f4"
+							],
+							"query": [
+								{
+									"key": "start",
+									"value": "2025-07-01T00:00:00"
+								},
+								{
+									"key": "end",
+									"value": "2025-07-31T23:59:59"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Buscar agendamentos de um profissional",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{Token}}"
+							}
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer SEU_TOKEN_JWT"
+							}
+						],
+						"url": "http://localhost:8000/appointments/professional/f8bd326c-e8e3-5ef4-974b-c6c393ged4f4"
+					},
+					"response": []
+				},
+				{
+					"name": "Buscar agendamentos de um paciente específico",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{Token}}"
+							}
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer SEU_TOKEN_JWT"
+							}
+						],
+						"url": "http://localhost:8000/appointments/patient/p1a2b3c4-d5e6-7f8g-9h0i-j1k2l3m4n5o6"
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "Token",
+			"value": "",
+			"type": "string"
+		}
+	]
+}
